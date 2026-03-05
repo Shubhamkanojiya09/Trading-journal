@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian Intraday Trading Journal</title>
+    <title>TradeGenius Pro - Indian Trading Journal</title>
     <style>
         * {
             margin: 0;
@@ -12,94 +12,330 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0f172a;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 100%);
             color: #e2e8f0;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-bottom: 2px solid #0ea5e9;
-            padding: 30px 20px;
+        /* NAVIGATION */
+        nav {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(14, 165, 233, 0.2);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             margin-bottom: 30px;
-            border-radius: 8px;
         }
 
-        h1 {
-            font-size: 32px;
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-tab {
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-tab.active {
             color: #0ea5e9;
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        .nav-tab:hover {
+            color: #0ea5e9;
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .capital-display {
+            background: rgba(14, 165, 233, 0.1);
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+
+        /* HOME PAGE */
+        .home-section {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            border-radius: 15px;
+            padding: 60px 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .quote-section {
+            margin-bottom: 40px;
+        }
+
+        .quote-text {
+            font-size: 32px;
+            font-weight: 600;
+            color: #0ea5e9;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .quote-author {
+            color: #94a3b8;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .refresh-quote {
+            background: rgba(14, 165, 233, 0.2);
+            border: 1px solid #0ea5e9;
+            color: #0ea5e9;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-quote:hover {
+            background: #0ea5e9;
+            color: #0f172a;
+        }
+
+        .motivation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .motivation-card {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .motivation-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .motivation-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0ea5e9;
+            margin-bottom: 10px;
+        }
+
+        .motivation-text {
+            font-size: 13px;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
             margin-bottom: 5px;
         }
 
-        .subtitle {
-            color: #94a3b8;
-            font-size: 14px;
+        .stat-positive {
+            color: #22c55e;
         }
 
-        .tabs {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 15px;
-            flex-wrap: wrap;
+        .stat-negative {
+            color: #ef4444;
         }
 
-        .tab-btn {
-            padding: 10px 25px;
-            background: none;
+        .stat-neutral {
+            color: #0ea5e9;
+        }
+
+        .stat-subtitle {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* QUICK ACTION BUTTONS */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
             border: none;
-            color: #94a3b8;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
             transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-            position: relative;
-            bottom: 0;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
         }
 
-        .tab-btn.active {
-            color: #0ea5e9;
-            border-bottom-color: #0ea5e9;
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(14, 165, 233, 0.5);
         }
 
-        .tab-btn:hover {
-            color: #0ea5e9;
-        }
-
-        .tab-content {
+        /* TRADE ENTRY MODAL */
+        .modal {
             display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            overflow-y: auto;
         }
 
-        .tab-content.active {
+        .modal.active {
             display: block;
         }
 
-        .section {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 25px;
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            border-radius: 15px;
+            margin: 40px auto;
+            padding: 40px;
+            max-width: 700px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
         }
 
-        .section-title {
-            font-size: 18px;
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(14, 165, 233, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 24px;
             font-weight: bold;
             color: #0ea5e9;
-            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #0ea5e9;
+        }
+
+        /* FORM STYLES */
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #0ea5e9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -110,301 +346,312 @@
         }
 
         label {
-            font-size: 13px;
+            font-size: 12px;
             color: #cbd5e1;
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        input, select, textarea {
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select {
             padding: 12px;
-            background: #0f172a;
+            background: rgba(15, 23, 42, 0.8);
             border: 1px solid #334155;
-            border-radius: 5px;
+            border-radius: 8px;
             color: #e2e8f0;
             font-size: 14px;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: #0ea5e9;
-            outline: none;
-            box-shadow: 0 0 10px rgba(14, 165, 233, 0.2);
-        }
-
-        textarea {
-            resize: vertical;
-            font-family: inherit;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .btn-primary {
-            background: #0ea5e9;
-            color: #0f172a;
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
+        input:focus,
+        select:focus {
+            border-color: #0ea5e9;
+            background: #0f172a;
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.2);
         }
 
-        .btn-primary:hover {
-            background: #06b6d4;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(14, 165, 233, 0.4);
+        /* OPTIONS BUTTONS */
+        .options-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
         }
 
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-            font-size: 12px;
-            padding: 8px 15px;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: #1e293b;
-            border: 1px solid #334155;
+        .option-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 15px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid #334155;
+            color: #cbd5e1;
             border-radius: 8px;
-            padding: 25px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .card-title {
+        .option-btn:hover {
+            border-color: #0ea5e9;
+            color: #0ea5e9;
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        .option-btn.selected {
+            background: #0ea5e9;
+            border-color: #0ea5e9;
+            color: #0f172a;
+            font-weight: bold;
+        }
+
+        /* RISK CALCULATOR */
+        .risk-calc {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .risk-calc-title {
             font-size: 13px;
-            color: #94a3b8;
-            margin-bottom: 10px;
+            font-weight: bold;
+            color: #22c55e;
+            margin-bottom: 15px;
             text-transform: uppercase;
         }
 
-        .card-value {
-            font-size: 32px;
-            font-weight: bold;
+        .risk-calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .risk-calc-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .risk-calc-label {
+            font-size: 11px;
+            color: #cbd5e1;
             margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .card-subtitle {
-            font-size: 12px;
-            color: #64748b;
+        .risk-calc-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #22c55e;
         }
 
-        .positive { color: #22c55e; }
-        .negative { color: #ef4444; }
-        .neutral { color: #0ea5e9; }
+        /* BUTTONS */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
 
-        .trade-item {
-            background: #0f172a;
-            border: 1px solid #334155;
+        .btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-cancel {
+            background: rgba(30, 41, 59, 0.8);
+            color: #cbd5e1;
+            border: 1px solid #334155;
+        }
+
+        .btn-cancel:hover {
+            border-color: #0ea5e9;
+            color: #0ea5e9;
+        }
+
+        /* TRADES LOG */
+        .trades-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .trade-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            border-radius: 10px;
+            padding: 25px;
+            overflow: hidden;
         }
 
         .trade-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            align-items: flex-start;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
+        }
+
+        .trade-info {
+            flex: 1;
         }
 
         .trade-symbol {
             font-size: 20px;
             font-weight: bold;
             color: #0ea5e9;
+            margin-bottom: 5px;
+        }
+
+        .trade-meta {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .trade-result {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
         }
 
         .trade-pnl {
-            font-size: 18px;
+            font-size: 24px;
             font-weight: bold;
+        }
+
+        .trade-status-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .trade-status-win {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.5);
+        }
+
+        .trade-status-loss {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.5);
         }
 
         .trade-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            padding: 15px 0;
-            border-top: 1px solid #334155;
-            border-bottom: 1px solid #334155;
-            margin-bottom: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+            border-top: 1px solid rgba(14, 165, 233, 0.1);
+            border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+            margin: 20px 0;
         }
 
-        .detail-item {
+        .detail {
             display: flex;
             flex-direction: column;
         }
 
         .detail-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #94a3b8;
             text-transform: uppercase;
             margin-bottom: 5px;
+            letter-spacing: 0.5px;
         }
 
         .detail-value {
             font-size: 14px;
             color: #e2e8f0;
-            font-weight: 500;
-        }
-
-        .trade-status {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
             font-weight: 600;
         }
 
-        .trade-status.win {
-            background: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
+        .trade-notes {
+            background: rgba(14, 165, 233, 0.05);
+            border-left: 3px solid #0ea5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 13px;
+            color: #cbd5e1;
+            line-height: 1.6;
         }
 
-        .trade-status.loss {
+        .trade-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete {
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.5);
         }
 
-        .reason-box {
-            background: #1e293b;
-            border-left: 4px solid #0ea5e9;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.3);
         }
 
-        .reason-label {
-            color: #94a3b8;
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .reason-text {
-            color: #e2e8f0;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .alert {
-            padding: 15px 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            border: 1px solid;
-        }
-
-        .alert-warning {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: #ef4444;
-            color: #fca5a5;
-        }
-
-        .alert-success {
-            background: rgba(34, 197, 94, 0.1);
-            border-color: #22c55e;
-            color: #86efac;
-        }
-
-        .alert-info {
-            background: rgba(14, 165, 233, 0.1);
-            border-color: #0ea5e9;
-            color: #7dd3fc;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #64748b;
-        }
-
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        .message {
-            padding: 15px 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .message.show {
-            display: block;
-        }
-
-        .message.success {
-            background: rgba(34, 197, 94, 0.9);
-            border: 1px solid #22c55e;
-            color: white;
-        }
-
-        .message.error {
-            background: rgba(239, 68, 68, 0.9);
-            border: 1px solid #ef4444;
-            color: white;
-        }
-
-        .stats-grid {
+        /* ANALYSIS */
+        .analysis-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
-        .stat-box {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
+        .analysis-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            border-radius: 10px;
+            padding: 25px;
         }
 
-        .stat-number {
-            font-size: 28px;
+        .analysis-title {
+            font-size: 14px;
             font-weight: bold;
             color: #0ea5e9;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #94a3b8;
+            margin-bottom: 20px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .analysis-item {
@@ -412,7 +659,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 0;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid rgba(14, 165, 233, 0.1);
         }
 
         .analysis-item:last-child {
@@ -427,6 +674,62 @@
         .analysis-value {
             font-weight: bold;
             color: #0ea5e9;
+            font-size: 14px;
+        }
+
+        /* MESSAGE */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            border: 1px solid #22c55e;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: 1px solid #ef4444;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 30px;
+            color: #94a3b8;
+        }
+
+        .tabs-content {
+            display: none;
+        }
+
+        .tabs-content.active {
+            display: block;
         }
 
         @media (max-width: 768px) {
@@ -434,358 +737,471 @@
                 grid-template-columns: 1fr;
             }
 
-            .dashboard-grid {
-                grid-template-columns: 1fr;
+            .modal-content {
+                margin: 20px;
+                padding: 25px;
             }
 
-            h1 {
+            .quote-text {
                 font-size: 24px;
             }
 
-            .tabs {
-                flex-wrap: wrap;
+            .nav-tabs {
                 gap: 10px;
+                overflow-x: auto;
             }
 
-            .tab-btn {
+            .nav-tab {
                 padding: 8px 15px;
                 font-size: 13px;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .options-row {
+                flex-direction: column;
+            }
+
+            .option-btn {
+                min-width: unset;
             }
         }
     </style>
 </head>
 <body>
+    <!-- NAVIGATION -->
+    <nav>
+        <div class="nav-content">
+            <div class="logo">📈 TradeGenius Pro</div>
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="showTab('home')">Home</div>
+                <div class="nav-tab" onclick="showTab('trade')">Log Trade</div>
+                <div class="nav-tab" onclick="showTab('trades')">Trades</div>
+                <div class="nav-tab" onclick="showTab('analysis')">Analysis</div>
+                <div class="nav-tab" onclick="showTab('settings')">Settings</div>
+            </div>
+            <div class="user-info">
+                <div class="capital-display">Capital: ₹<span id="capitalDisplay">100000</span></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MESSAGE -->
     <div id="message" class="message"></div>
 
+    <!-- MAIN CONTAINER -->
     <div class="container">
-        <header>
-            <h1>📊 Indian Intraday Trading Journal</h1>
-            <p class="subtitle">Track your trades, analyze performance, and improve your trading discipline</p>
-        </header>
-
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('dashboard')">📈 Dashboard</button>
-            <button class="tab-btn" onclick="switchTab('newtrade')">➕ New Trade</button>
-            <button class="tab-btn" onclick="switchTab('trades')">📋 Trades Log</button>
-            <button class="tab-btn" onclick="switchTab('analysis')">📊 Analysis</button>
-            <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
-        </div>
-
-        <!-- DASHBOARD -->
-        <div id="dashboard" class="tab-content active">
-            <div class="dashboard-grid">
-                <div class="card">
-                    <div class="card-title">Today's P&L</div>
-                    <div class="card-value" id="totalPnl">₹0.00</div>
-                    <div class="card-subtitle">Net Profit/Loss</div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">Win Rate</div>
-                    <div class="card-value neutral" id="winRate">0%</div>
-                    <div class="card-subtitle">Winning Trades</div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">Total Trades</div>
-                    <div class="card-value neutral" id="totalTrades">0</div>
-                    <div class="card-subtitle">Today</div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">Largest Win</div>
-                    <div class="card-value positive" id="largestWin">₹0.00</div>
-                    <div class="card-subtitle">Best Trade</div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">Largest Loss</div>
-                    <div class="card-value negative" id="largestLoss">₹0.00</div>
-                    <div class="card-subtitle">Worst Trade</div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">Avg Per Trade</div>
-                    <div class="card-value neutral" id="avgPerTrade">₹0.00</div>
-                    <div class="card-subtitle">Average P&L</div>
+        <!-- HOME TAB -->
+        <div id="home-tab" class="tabs-content active">
+            <div class="home-section">
+                <div class="quote-section">
+                    <div class="quote-text" id="quoteText">"The goal of a successful trader is to make the best trades. Money is secondary."</div>
+                    <div class="quote-author" id="quoteAuthor">– Alexander Elder</div>
+                    <button class="refresh-quote" onclick="refreshQuote()">🔄 New Quote</button>
                 </div>
             </div>
 
-            <div id="overtradingAlert"></div>
+            <div class="stat-cards" id="homeStats"></div>
+
+            <div class="motivation-grid">
+                <div class="motivation-card">
+                    <div class="motivation-icon">📊</div>
+                    <div class="motivation-title">Track Every Trade</div>
+                    <div class="motivation-text">Document your setup, reasons, and emotions to identify patterns and improve</div>
+                </div>
+                <div class="motivation-card">
+                    <div class="motivation-icon">⚡</div>
+                    <div class="motivation-title">Risk Management</div>
+                    <div class="motivation-text">Automatic risk calculations based on your capital to keep you disciplined</div>
+                </div>
+                <div class="motivation-card">
+                    <div class="motivation-icon">📈</div>
+                    <div class="motivation-title">Analyze Performance</div>
+                    <div class="motivation-text">Get detailed insights on your win rate, P&L, and trading patterns</div>
+                </div>
+                <div class="motivation-card">
+                    <div class="motivation-icon">🎯</div>
+                    <div class="motivation-title">Stay Disciplined</div>
+                    <div class="motivation-text">Set daily limits and receive alerts to prevent overtrading and emotional decisions</div>
+                </div>
+                <div class="motivation-card">
+                    <div class="motivation-icon">💡</div>
+                    <div class="motivation-title">Learn & Improve</div>
+                    <div class="motivation-text">Review your trades, understand your mistakes, and continuously evolve</div>
+                </div>
+                <div class="motivation-card">
+                    <div class="motivation-icon">🏆</div>
+                    <div class="motivation-title">Become Profitable</div>
+                    <div class="motivation-text">With discipline and proper tracking, consistency and profits follow</div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="action-btn" onclick="openTradeModal()">➕ Log New Trade</button>
+                <button class="action-btn" onclick="showTab('analysis')">📊 View Analysis</button>
+                <button class="action-btn" onclick="showTab('settings')">⚙️ Settings</button>
+            </div>
         </div>
 
-        <!-- NEW TRADE -->
-        <div id="newtrade" class="tab-content">
-            <div class="section">
-                <div class="section-title">📝 Log New Trade</div>
+        <!-- TRADE ENTRY MODAL -->
+        <div id="tradeModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">📝 Log Your Trade</div>
+                    <button class="close-btn" onclick="closeTradeModal()">×</button>
+                </div>
 
+                <!-- TRADE BASICS -->
+                <div class="form-section">
+                    <div class="form-section-title">⏰ Trade Timing</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="tradeDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Entry Time</label>
+                            <input type="time" id="entryTime">
+                        </div>
+                        <div class="form-group">
+                            <label>Exit Time</label>
+                            <input type="time" id="exitTime">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STOCK & TRADE TYPE -->
+                <div class="form-section">
+                    <div class="form-section-title">📍 Stock & Direction</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Stock Symbol</label>
+                            <input type="text" id="symbol" placeholder="e.g., RELIANCE, INFY" style="text-transform: uppercase;">
+                        </div>
+                    </div>
+                    <label style="margin-top: 15px; margin-bottom: 10px;">Trade Type</label>
+                    <div class="options-row">
+                        <button class="option-btn" onclick="selectTradeType('Long')">🟢 LONG (Buy)</button>
+                        <button class="option-btn" onclick="selectTradeType('Short')">🔴 SHORT (Sell)</button>
+                    </div>
+                </div>
+
+                <!-- ENTRY & EXIT PRICES -->
+                <div class="form-section">
+                    <div class="form-section-title">💹 Entry & Exit</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Entry Price (₹)</label>
+                            <input type="number" id="entryPrice" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Exit Price (₹)</label>
+                            <input type="number" id="exitPrice" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Quantity</label>
+                            <input type="number" id="quantity" placeholder="1" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RISK CALCULATION -->
+                <div class="risk-calc">
+                    <div class="risk-calc-title">⚡ Risk Calculation</div>
+                    <div class="risk-calc-grid">
+                        <div class="risk-calc-item">
+                            <div class="risk-calc-label">Risk Amount</div>
+                            <div class="risk-calc-value">₹<span id="riskAmount">0</span></div>
+                        </div>
+                        <div class="risk-calc-item">
+                            <div class="risk-calc-label">Risk %</div>
+                            <div class="risk-calc-value"><span id="riskPercent">0</span>%</div>
+                        </div>
+                        <div class="risk-calc-item">
+                            <div class="risk-calc-label">Profit</div>
+                            <div class="risk-calc-value" id="profitDisplay" style="color: #22c55e;">₹0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK SELECTIONS -->
+                <div class="form-section">
+                    <label style="margin-bottom: 10px;">Risk Category</label>
+                    <div class="options-row">
+                        <button class="option-btn" onclick="selectRiskCategory('Scalp')">⚡ Scalp</button>
+                        <button class="option-btn" onclick="selectRiskCategory('Intraday')">📊 Intraday</button>
+                        <button class="option-btn" onclick="selectRiskCategory('Swing')">📈 Swing</button>
+                    </div>
+
+                    <label style="margin-top: 15px; margin-bottom: 10px;">Confidence Level</label>
+                    <div class="options-row">
+                        <button class="option-btn" onclick="selectConfidence('Low')">🔴 Low</button>
+                        <button class="option-btn" onclick="selectConfidence('Medium')">🟡 Medium</button>
+                        <button class="option-btn" onclick="selectConfidence('High')">🟢 High</button>
+                    </div>
+
+                    <label style="margin-top: 15px; margin-bottom: 10px;">Trade Outcome</label>
+                    <div class="options-row">
+                        <button class="option-btn" onclick="selectOutcome('Planned')">✅ Planned Exit</button>
+                        <button class="option-btn" onclick="selectOutcome('Emotional')">😤 Emotional Exit</button>
+                        <button class="option-btn" onclick="selectOutcome('Trailing')">📍 Trailing SL</button>
+                        <button class="option-btn" onclick="selectOutcome('BreakEven')">⚖️ Break Even</button>
+                    </div>
+                </div>
+
+                <!-- TRADE NOTES -->
+                <div class="form-section">
+                    <label style="display: block; margin-bottom: 10px;">Quick Notes (Optional)</label>
+                    <textarea id="notes" placeholder="Setup, entry reason, exit reason, what could be better..." style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-family: inherit; min-height: 100px; resize: vertical;"></textarea>
+                </div>
+
+                <!-- BUTTONS -->
+                <div class="btn-group">
+                    <button class="btn btn-submit" onclick="saveTrade()">Save Trade</button>
+                    <button class="btn btn-cancel" onclick="closeTradeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRADES LOG TAB -->
+        <div id="trades-tab" class="tabs-content">
+            <div class="form-section">
+                <div class="form-section-title">📋 Today's Trades</div>
+                <div id="tradesLog" class="trades-container"></div>
+            </div>
+        </div>
+
+        <!-- ANALYSIS TAB -->
+        <div id="analysis-tab" class="tabs-content">
+            <div class="form-section">
+                <div class="form-section-title">📊 Performance Analysis</div>
+                <div class="analysis-grid" id="analysisGrid"></div>
+            </div>
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div id="settings-tab" class="tabs-content">
+            <div class="form-section">
+                <div class="form-section-title">⚙️ Account Settings</div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Date</label>
-                        <input type="date" id="tradeDate">
+                        <label>Total Capital (₹)</label>
+                        <input type="number" id="capitalInput" value="100000" step="1000">
                     </div>
-
                     <div class="form-group">
-                        <label>Entry Time</label>
-                        <input type="time" id="entryTime">
+                        <label>Risk Per Trade (%)</label>
+                        <input type="number" id="riskPercent" value="1" step="0.1" min="0.1" max="5">
                     </div>
-
-                    <div class="form-group">
-                        <label>Exit Time</label>
-                        <input type="time" id="exitTime">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Stock Symbol</label>
-                        <input type="text" id="symbol" placeholder="e.g., RELIANCE">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Trade Type</label>
-                        <select id="tradeType">
-                            <option value="">Select Type</option>
-                            <option value="Long">🟢 LONG</option>
-                            <option value="Short">🔴 SHORT</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Entry Price (₹)</label>
-                        <input type="number" id="entryPrice" step="0.01">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Exit Price (₹)</label>
-                        <input type="number" id="exitPrice" step="0.01">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Quantity (Shares)</label>
-                        <input type="number" id="quantity" step="1">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Risk Category</label>
-                        <select id="riskCategory">
-                            <option value="">Select Category</option>
-                            <option value="Scalp">Scalp (< 1 min)</option>
-                            <option value="Intraday">Intraday (1-30 min)</option>
-                            <option value="Swing">Swing (> 30 min)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Confidence</label>
-                        <select id="confidence">
-                            <option value="">Select Level</option>
-                            <option value="High">🟢 High</option>
-                            <option value="Medium">🟡 Medium</option>
-                            <option value="Low">🔴 Low</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Brokerage (₹)</label>
-                        <input type="number" id="charges" step="0.01" value="0">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Setup & Strategy</label>
-                    <textarea id="setup" rows="3" placeholder="Describe your trade setup..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Entry Reason</label>
-                    <textarea id="entryReason" rows="3" placeholder="Why did you enter?"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Exit Reason</label>
-                    <textarea id="exitReason" rows="3" placeholder="Why did you exit?"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Emotions & Behavior</label>
-                    <textarea id="emotions" rows="3" placeholder="How did you feel during the trade?"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>What Could Be Better?</label>
-                    <textarea id="improvement" rows="3" placeholder="Key learning points..."></textarea>
-                </div>
-
-                <button class="btn btn-primary" onclick="saveTrade()">Save Trade</button>
-            </div>
-        </div>
-
-        <!-- TRADES LOG -->
-        <div id="trades" class="tab-content">
-            <div class="section">
-                <div class="section-title">🗂️ All Trades</div>
-
-                <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px;">
-                    <div class="form-group">
-                        <label>Filter by Type</label>
-                        <select id="filterType" onchange="displayTrades()">
-                            <option value="">All Types</option>
-                            <option value="Long">LONG</option>
-                            <option value="Short">SHORT</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Filter by Result</label>
-                        <select id="filterResult" onchange="displayTrades()">
-                            <option value="">All Results</option>
-                            <option value="Win">Wins</option>
-                            <option value="Loss">Losses</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="tradesContainer"></div>
-            </div>
-        </div>
-
-        <!-- ANALYSIS -->
-        <div id="analysis" class="tab-content">
-            <div class="section">
-                <div class="section-title">📊 Performance Analysis</div>
-
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-number" id="statWins">0</div>
-                        <div class="stat-label">Wins</div>
-                    </div>
-
-                    <div class="stat-box">
-                        <div class="stat-number" id="statLosses">0</div>
-                        <div class="stat-label">Losses</div>
-                    </div>
-
-                    <div class="stat-box">
-                        <div class="stat-number" id="statAvgWin">₹0</div>
-                        <div class="stat-label">Avg Win</div>
-                    </div>
-
-                    <div class="stat-box">
-                        <div class="stat-number" id="statAvgLoss">₹0</div>
-                        <div class="stat-label">Avg Loss</div>
-                    </div>
-
-                    <div class="stat-box">
-                        <div class="stat-number" id="statRiskReward">0.00</div>
-                        <div class="stat-label">RR Ratio</div>
-                    </div>
-                </div>
-
-                <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-                    <div class="section">
-                        <div class="section-title">Trade Type Performance</div>
-                        <div id="typeAnalysis"></div>
-                    </div>
-
-                    <div class="section">
-                        <div class="section-title">Risk Category Performance</div>
-                        <div id="riskAnalysis"></div>
-                    </div>
-
-                    <div class="section">
-                        <div class="section-title">Confidence Level Performance</div>
-                        <div id="confAnalysis"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SETTINGS -->
-        <div id="settings" class="tab-content">
-            <div class="section">
-                <div class="section-title">⚙️ Trading Settings</div>
-
-                <div class="form-grid">
                     <div class="form-group">
                         <label>Daily Loss Limit (₹)</label>
-                        <input type="number" id="dailyLossLimit" value="5000">
+                        <input type="number" id="dailyLossLimit" value="5000" step="100">
                     </div>
-
                     <div class="form-group">
                         <label>Daily Profit Target (₹)</label>
-                        <input type="number" id="dailyProfitTarget" value="10000">
+                        <input type="number" id="dailyProfitTarget" value="10000" step="100">
                     </div>
-
                     <div class="form-group">
                         <label>Max Trades Per Day</label>
-                        <input type="number" id="maxTradesPerDay" value="10" min="1">
+                        <input type="number" id="maxTrades" value="10" step="1" min="1">
                     </div>
-
                     <div class="form-group">
                         <label>Max Consecutive Losses</label>
-                        <input type="number" id="maxConsecutiveLosses" value="3" min="1">
+                        <input type="number" id="maxLosses" value="3" step="1" min="1">
                     </div>
                 </div>
-
-                <button class="btn btn-primary" onclick="saveSettings()" style="margin-bottom: 20px;">Save Settings</button>
-
-                <div style="border-top: 1px solid #334155; padding-top: 20px;">
-                    <button class="btn btn-danger" onclick="resetData()" style="width: 100%; padding: 12px; background: #7f1d1d;">Delete All Data</button>
-                </div>
+                <button class="btn btn-submit" onclick="saveSettings()" style="margin-top: 20px;">Save Settings</button>
+                <button class="btn btn-cancel" onclick="resetAllData()" style="margin-top: 10px;">Delete All Data</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Load data from localStorage
+        // QUOTES DATABASE
+        const quotes = [
+            { text: "The goal of a successful trader is to make the best trades. Money is secondary.", author: "Alexander Elder" },
+            { text: "Risk comes from not knowing what you are doing.", author: "Warren Buffett" },
+            { text: "The market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
+            { text: "In trading, you have to be defensive. You have to protect your capital.", author: "Mark Douglas" },
+            { text: "Discipline is the one thing that can never be taken from you.", author: "Ratan Tata" },
+            { text: "A winning strategy must have entry rules, exit rules, and money management rules.", author: "Alexander Elder" },
+            { text: "The trend is your friend until the end.", author: "Edwin Lefèvre" },
+            { text: "No trader likes to hold a loss. That's the actual root of evil in trading.", author: "Mark Douglas" },
+            { text: "The secret to being successful from a trading perspective is to have an indefatigable add to work.", author: "Paul Tudor Jones" },
+            { text: "If you don't know who you are, this is an expensive place to find out.", author: "Adam Smith" },
+            { text: "The best traders are humble. They accept that they can be wrong.", author: "Ed Seykota" },
+            { text: "Patience is the pillar of the trader. If you can't wait, you can't win.", author: "Trading Wisdom" },
+            { text: "Every loss is a lesson. Every win is a confirmation of your strategy.", author: "Trading Wisdom" },
+            { text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "Phillip Fisher" },
+            { text: "You must be disciplined or failure is certain. The path to success requires absolute discipline.", author: "Mark Douglas" }
+        ];
+
+        // DATA STORAGE
         let trades = JSON.parse(localStorage.getItem('trades')) || [];
         let settings = JSON.parse(localStorage.getItem('settings')) || {
+            capital: 100000,
+            riskPercent: 1,
             dailyLossLimit: 5000,
             dailyProfitTarget: 10000,
-            maxTradesPerDay: 10,
-            maxConsecutiveLosses: 3
+            maxTrades: 10,
+            maxLosses: 3
         };
 
-        // Initialize
+        let selectedTradeType = '';
+        let selectedRiskCategory = '';
+        let selectedConfidence = '';
+        let selectedOutcome = '';
+
+        // INITIALIZATION
         document.getElementById('tradeDate').valueAsDate = new Date();
         loadSettings();
-        updateDashboard();
+        updateHomeStats();
+        refreshQuote();
 
-        // Tab switching
-        function switchTab(tab) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-            // Show selected tab
-            document.getElementById(tab).classList.add('active');
-            event.target.classList.add('active');
-
-            // Update displays
-            if (tab === 'trades') displayTrades();
-            if (tab === 'analysis') updateAnalysis();
+        // QUOTES
+        function refreshQuote() {
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quoteText').textContent = `"${quote.text}"`;
+            document.getElementById('quoteAuthor').textContent = `– ${quote.author}`;
         }
 
-        // Save trade
+        // TAB SWITCHING
+        function showTab(tabName) {
+            document.querySelectorAll('.tabs-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'trades') displayTrades();
+            if (tabName === 'analysis') updateAnalysis();
+            if (tabName === 'home') updateHomeStats();
+        }
+
+        // TRADE MODAL
+        function openTradeModal() {
+            resetTradeForm();
+            document.getElementById('tradeModal').classList.add('active');
+        }
+
+        function closeTradeModal() {
+            document.getElementById('tradeModal').classList.remove('active');
+        }
+
+        function resetTradeForm() {
+            document.getElementById('tradeDate').valueAsDate = new Date();
+            document.getElementById('entryTime').value = '';
+            document.getElementById('exitTime').value = '';
+            document.getElementById('symbol').value = '';
+            document.getElementById('entryPrice').value = '';
+            document.getElementById('exitPrice').value = '';
+            document.getElementById('quantity').value = '';
+            document.getElementById('notes').value = '';
+            selectedTradeType = '';
+            selectedRiskCategory = '';
+            selectedConfidence = '';
+            selectedOutcome = '';
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            updateRiskCalculation();
+        }
+
+        // OPTION SELECTIONS
+        function selectTradeType(type) {
+            selectedTradeType = type;
+            document.querySelectorAll('.option-btn').forEach((btn, idx) => {
+                if ((type === 'Long' && idx === 0) || (type === 'Short' && idx === 1)) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+
+        function selectRiskCategory(cat) {
+            selectedRiskCategory = cat;
+            document.querySelectorAll('.option-btn').forEach((btn, idx) => {
+                if ((cat === 'Scalp' && idx === 2) || (cat === 'Intraday' && idx === 3) || (cat === 'Swing' && idx === 4)) {
+                    btn.classList.add('selected');
+                } else if (idx >= 2 && idx <= 4) {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+
+        function selectConfidence(conf) {
+            selectedConfidence = conf;
+            document.querySelectorAll('.option-btn').forEach((btn, idx) => {
+                if ((conf === 'Low' && idx === 5) || (conf === 'Medium' && idx === 6) || (conf === 'High' && idx === 7)) {
+                    btn.classList.add('selected');
+                } else if (idx >= 5 && idx <= 7) {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+
+        function selectOutcome(outcome) {
+            selectedOutcome = outcome;
+            document.querySelectorAll('.option-btn').forEach((btn, idx) => {
+                if ((outcome === 'Planned' && idx === 8) || (outcome === 'Emotional' && idx === 9) || 
+                    (outcome === 'Trailing' && idx === 10) || (outcome === 'BreakEven' && idx === 11)) {
+                    btn.classList.add('selected');
+                } else if (idx >= 8 && idx <= 11) {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+
+        // RISK CALCULATION
+        function updateRiskCalculation() {
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value) || 0;
+            const exitPrice = parseFloat(document.getElementById('exitPrice').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+
+            if (!entryPrice || !exitPrice || !quantity) {
+                document.getElementById('riskAmount').textContent = '0';
+                document.getElementById('riskPercent').textContent = '0';
+                document.getElementById('profitDisplay').textContent = '₹0';
+                return;
+            }
+
+            let points = selectedTradeType === 'Long' ? Math.abs(exitPrice - entryPrice) : Math.abs(exitPrice - entryPrice);
+            let pnl = selectedTradeType === 'Long' 
+                ? (exitPrice - entryPrice) * quantity
+                : (entryPrice - exitPrice) * quantity;
+
+            const riskAmt = Math.abs(pnl);
+            const riskPct = (riskAmt / settings.capital * 100).toFixed(2);
+
+            document.getElementById('riskAmount').textContent = Math.abs(pnl).toFixed(0);
+            document.getElementById('riskPercent').textContent = riskPct;
+            document.getElementById('profitDisplay').textContent = `₹${pnl.toFixed(0)}`;
+            document.getElementById('profitDisplay').style.color = pnl >= 0 ? '#22c55e' : '#ef4444';
+        }
+
+        // EVENT LISTENERS FOR RISK CALC
+        document.getElementById('entryPrice').addEventListener('input', updateRiskCalculation);
+        document.getElementById('exitPrice').addEventListener('input', updateRiskCalculation);
+        document.getElementById('quantity').addEventListener('input', updateRiskCalculation);
+
+        // SAVE TRADE
         function saveTrade() {
             const tradeDate = document.getElementById('tradeDate').value;
             const entryTime = document.getElementById('entryTime').value;
             const exitTime = document.getElementById('exitTime').value;
             const symbol = document.getElementById('symbol').value.toUpperCase();
-            const tradeType = document.getElementById('tradeType').value;
             const entryPrice = parseFloat(document.getElementById('entryPrice').value);
             const exitPrice = parseFloat(document.getElementById('exitPrice').value);
             const quantity = parseInt(document.getElementById('quantity').value);
-            const charges = parseFloat(document.getElementById('charges').value) || 0;
-            const riskCategory = document.getElementById('riskCategory').value;
-            const confidence = document.getElementById('confidence').value;
 
-            if (!symbol || !tradeType || !entryPrice || !exitPrice || !quantity || !riskCategory || !confidence) {
-                showMessage('Please fill all required fields', 'error');
+            if (!symbol || !selectedTradeType || !entryPrice || !exitPrice || !quantity || !selectedRiskCategory || !selectedConfidence) {
+                showMsg('Please fill all required fields', 'error');
                 return;
             }
 
-            let points = tradeType === 'Long' ? (exitPrice - entryPrice) : (entryPrice - exitPrice);
-            let pnl = (points * quantity) - charges;
+            const pnl = selectedTradeType === 'Long' 
+                ? (exitPrice - entryPrice) * quantity
+                : (entryPrice - exitPrice) * quantity;
 
             const trade = {
                 id: Date.now(),
@@ -793,288 +1209,303 @@
                 entryTime,
                 exitTime,
                 symbol,
-                tradeType,
+                tradeType: selectedTradeType,
                 entryPrice,
                 exitPrice,
                 quantity,
-                charges,
                 pnl: Math.round(pnl * 100) / 100,
-                riskCategory,
-                confidence,
-                setup: document.getElementById('setup').value,
-                entryReason: document.getElementById('entryReason').value,
-                exitReason: document.getElementById('exitReason').value,
-                emotions: document.getElementById('emotions').value,
-                improvement: document.getElementById('improvement').value
+                riskCategory: selectedRiskCategory,
+                confidence: selectedConfidence,
+                outcome: selectedOutcome,
+                notes: document.getElementById('notes').value
             };
 
             trades.push(trade);
             localStorage.setItem('trades', JSON.stringify(trades));
 
-            // Clear form
-            document.getElementById('newtrade').querySelectorAll('textarea').forEach(el => el.value = '');
-            document.getElementById('symbol').value = '';
-            document.getElementById('entryPrice').value = '';
-            document.getElementById('exitPrice').value = '';
-            document.getElementById('quantity').value = '';
-            document.getElementById('charges').value = '0';
-
-            showMessage(`Trade saved! P&L: ${trade.pnl >= 0 ? '+' : ''}₹${trade.pnl.toFixed(2)}`, 'success');
-            updateDashboard();
+            showMsg(`Trade saved! P&L: ${pnl >= 0 ? '+' : ''}₹${pnl.toFixed(2)}`, 'success');
+            closeTradeModal();
+            updateHomeStats();
         }
 
-        // Get today's trades
+        // GET TODAY'S TRADES
         function getTodaysTrades() {
             const today = new Date().toISOString().split('T')[0];
             return trades.filter(t => t.date === today);
         }
 
-        // Update dashboard
-        function updateDashboard() {
+        // DISPLAY TRADES
+        function displayTrades() {
             const todaysTrades = getTodaysTrades();
 
             if (todaysTrades.length === 0) {
-                document.getElementById('totalPnl').textContent = '₹0.00';
-                document.getElementById('winRate').textContent = '0%';
-                document.getElementById('totalTrades').textContent = '0';
-                document.getElementById('largestWin').textContent = '₹0.00';
-                document.getElementById('largestLoss').textContent = '₹0.00';
-                document.getElementById('avgPerTrade').textContent = '₹0.00';
-                document.getElementById('overtradingAlert').innerHTML = '';
+                document.getElementById('tradesLog').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">No trades logged today. Start by logging your first trade!</div>
+                        <button class="action-btn" onclick="openTradeModal()" style="margin: 0 auto;">Log Trade</button>
+                    </div>
+                `;
                 return;
             }
 
-            const totalPnl = todaysTrades.reduce((sum, t) => sum + t.pnl, 0);
-            const wins = todaysTrades.filter(t => t.pnl > 0).length;
-            const losses = todaysTrades.filter(t => t.pnl < 0).length;
-            const winRate = Math.round((wins / todaysTrades.length) * 100);
-            const largestWin = Math.max(...todaysTrades.map(t => t.pnl), 0);
-            const largestLoss = Math.min(...todaysTrades.map(t => t.pnl), 0);
-            const avgPerTrade = totalPnl / todaysTrades.length;
-
-            // Update cards
-            const pnlEl = document.getElementById('totalPnl');
-            pnlEl.textContent = totalPnl >= 0 ? `+₹${totalPnl.toFixed(2)}` : `₹${totalPnl.toFixed(2)}`;
-            pnlEl.className = `card-value ${totalPnl >= 0 ? 'positive' : 'negative'}`;
-
-            document.getElementById('winRate').textContent = `${winRate}%`;
-            document.getElementById('totalTrades').textContent = todaysTrades.length;
-            document.getElementById('largestWin').textContent = `+₹${largestWin.toFixed(2)}`;
-            document.getElementById('largestLoss').textContent = `₹${largestLoss.toFixed(2)}`;
-            document.getElementById('avgPerTrade').textContent = `₹${avgPerTrade.toFixed(2)}`;
-
-            // Check overtrading
-            let alertHTML = '';
-            if (todaysTrades.length >= settings.maxTradesPerDay) {
-                alertHTML += `<div class="alert alert-warning">⚠️ You've reached your daily trade limit of ${settings.maxTradesPerDay}</div>`;
-            }
-            if (totalPnl < -settings.dailyLossLimit) {
-                alertHTML += `<div class="alert alert-warning">⚠️ You've exceeded your daily loss limit of ₹${settings.dailyLossLimit}</div>`;
-            }
-            if (totalPnl >= settings.dailyProfitTarget) {
-                alertHTML += `<div class="alert alert-success">✅ You've reached your daily profit target of ₹${settings.dailyProfitTarget}!</div>`;
-            }
-
-            let consecutiveLosses = 0;
-            for (let i = todaysTrades.length - 1; i >= 0; i--) {
-                if (todaysTrades[i].pnl < 0) consecutiveLosses++;
-                else break;
-            }
-            if (consecutiveLosses >= settings.maxConsecutiveLosses) {
-                alertHTML += `<div class="alert alert-warning">⚠️ ${consecutiveLosses} consecutive losses. Consider a break!</div>`;
-            }
-
-            document.getElementById('overtradingAlert').innerHTML = alertHTML;
-        }
-
-        // Display trades
-        function displayTrades() {
-            let todaysTrades = getTodaysTrades();
-
-            const filterType = document.getElementById('filterType').value;
-            const filterResult = document.getElementById('filterResult').value;
-
-            if (filterType) todaysTrades = todaysTrades.filter(t => t.tradeType === filterType);
-            if (filterResult === 'Win') todaysTrades = todaysTrades.filter(t => t.pnl > 0);
-            if (filterResult === 'Loss') todaysTrades = todaysTrades.filter(t => t.pnl < 0);
-
-            const container = document.getElementById('tradesContainer');
-
-            if (todaysTrades.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>No trades yet</p></div>';
-                return;
-            }
-
-            container.innerHTML = todaysTrades.map(trade => `
-                <div class="trade-item">
+            document.getElementById('tradesLog').innerHTML = todaysTrades.map(trade => `
+                <div class="trade-card">
                     <div class="trade-header">
-                        <div>
+                        <div class="trade-info">
                             <div class="trade-symbol">${trade.symbol} ${trade.tradeType === 'Long' ? '🟢' : '🔴'}</div>
-                            <div style="font-size: 12px; color: #94a3b8;">${trade.date} | ${trade.entryTime} - ${trade.exitTime}</div>
+                            <div class="trade-meta">${trade.date} | ${trade.entryTime} → ${trade.exitTime}</div>
                         </div>
-                        <div style="text-align: right;">
+                        <div class="trade-result">
                             <div class="trade-pnl" style="color: ${trade.pnl >= 0 ? '#22c55e' : '#ef4444'};">
                                 ${trade.pnl >= 0 ? '+' : ''}₹${trade.pnl.toFixed(2)}
                             </div>
-                            <span class="trade-status ${trade.pnl > 0 ? 'win' : 'loss'}">
-                                ${trade.pnl > 0 ? 'WIN' : 'LOSS'}
-                            </span>
+                            <div class="trade-status-badge ${trade.pnl > 0 ? 'trade-status-win' : 'trade-status-loss'}">
+                                ${trade.pnl > 0 ? '✓ WIN' : '✗ LOSS'}
+                            </div>
                         </div>
                     </div>
 
                     <div class="trade-details">
-                        <div class="detail-item">
+                        <div class="detail">
                             <div class="detail-label">Entry</div>
                             <div class="detail-value">₹${trade.entryPrice.toFixed(2)}</div>
                         </div>
-                        <div class="detail-item">
+                        <div class="detail">
                             <div class="detail-label">Exit</div>
                             <div class="detail-value">₹${trade.exitPrice.toFixed(2)}</div>
                         </div>
-                        <div class="detail-item">
+                        <div class="detail">
                             <div class="detail-label">Qty</div>
                             <div class="detail-value">${trade.quantity}</div>
                         </div>
-                        <div class="detail-item">
+                        <div class="detail">
                             <div class="detail-label">Category</div>
                             <div class="detail-value">${trade.riskCategory}</div>
                         </div>
-                        <div class="detail-item">
+                        <div class="detail">
                             <div class="detail-label">Confidence</div>
                             <div class="detail-value">${trade.confidence}</div>
                         </div>
+                        <div class="detail">
+                            <div class="detail-label">Outcome</div>
+                            <div class="detail-value">${trade.outcome || 'N/A'}</div>
+                        </div>
                     </div>
 
-                    ${trade.setup ? `<div class="reason-box"><div class="reason-label">Setup</div><div class="reason-text">${trade.setup}</div></div>` : ''}
-                    ${trade.entryReason ? `<div class="reason-box"><div class="reason-label">Entry Reason</div><div class="reason-text">${trade.entryReason}</div></div>` : ''}
-                    ${trade.exitReason ? `<div class="reason-box"><div class="reason-label">Exit Reason</div><div class="reason-text">${trade.exitReason}</div></div>` : ''}
-                    ${trade.emotions ? `<div class="reason-box"><div class="reason-label">Emotions</div><div class="reason-text">${trade.emotions}</div></div>` : ''}
-                    ${trade.improvement ? `<div class="reason-box"><div class="reason-label">Improvement</div><div class="reason-text">${trade.improvement}</div></div>` : ''}
+                    ${trade.notes ? `<div class="trade-notes">${trade.notes}</div>` : ''}
 
-                    <button class="btn btn-danger" onclick="deleteTrade(${trade.id})" style="margin-top: 15px;">Delete</button>
+                    <div class="trade-actions">
+                        <button class="btn-small btn-delete" onclick="deleteTrade(${trade.id})">🗑️ Delete</button>
+                    </div>
                 </div>
             `).join('');
         }
 
-        // Delete trade
+        // DELETE TRADE
         function deleteTrade(id) {
             if (confirm('Delete this trade?')) {
                 trades = trades.filter(t => t.id !== id);
                 localStorage.setItem('trades', JSON.stringify(trades));
                 displayTrades();
-                updateDashboard();
+                updateHomeStats();
                 updateAnalysis();
-                showMessage('Trade deleted', 'success');
+                showMsg('Trade deleted', 'success');
             }
         }
 
-        // Update analysis
+        // UPDATE ANALYSIS
         function updateAnalysis() {
             const todaysTrades = getTodaysTrades();
 
             if (todaysTrades.length === 0) {
-                document.getElementById('statWins').textContent = '0';
-                document.getElementById('statLosses').textContent = '0';
-                document.getElementById('statAvgWin').textContent = '₹0';
-                document.getElementById('statAvgLoss').textContent = '₹0';
-                document.getElementById('statRiskReward').textContent = '0.00';
+                document.getElementById('analysisGrid').innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">📊</div>
+                        <div class="empty-state-text">No trades to analyze yet. Log some trades to see your performance!</div>
+                    </div>
+                `;
                 return;
             }
 
             const wins = todaysTrades.filter(t => t.pnl > 0);
             const losses = todaysTrades.filter(t => t.pnl < 0);
-            const avgWin = wins.length > 0 ? wins.reduce((sum, t) => sum + t.pnl, 0) / wins.length : 0;
-            const avgLoss = losses.length > 0 ? losses.reduce((sum, t) => sum + t.pnl, 0) / losses.length : 0;
+            const totalPnl = todaysTrades.reduce((sum, t) => sum + t.pnl, 0);
+            const avgWin = wins.length > 0 ? (wins.reduce((sum, t) => sum + t.pnl, 0) / wins.length) : 0;
+            const avgLoss = losses.length > 0 ? (losses.reduce((sum, t) => sum + t.pnl, 0) / losses.length) : 0;
 
-            document.getElementById('statWins').textContent = wins.length;
-            document.getElementById('statLosses').textContent = losses.length;
-            document.getElementById('statAvgWin').textContent = `+₹${avgWin.toFixed(0)}`;
-            document.getElementById('statAvgLoss').textContent = `₹${avgLoss.toFixed(0)}`;
-            document.getElementById('statRiskReward').textContent = (Math.abs(avgWin / avgLoss) || 0).toFixed(2);
+            // Group by categories
+            const byType = {};
+            const byCategory = {};
+            const byConfidence = {};
 
-            // Type analysis
-            const longs = todaysTrades.filter(t => t.tradeType === 'Long');
-            const shorts = todaysTrades.filter(t => t.tradeType === 'Short');
-            document.getElementById('typeAnalysis').innerHTML = `
-                <div class="analysis-item">
-                    <span class="analysis-label">LONG: ${longs.length} trades</span>
-                    <span class="analysis-value">${longs.length > 0 ? Math.round((longs.filter(t => t.pnl > 0).length / longs.length) * 100) : 0}% Win</span>
+            todaysTrades.forEach(t => {
+                // By type
+                if (!byType[t.tradeType]) byType[t.tradeType] = { count: 0, pnl: 0, wins: 0 };
+                byType[t.tradeType].count++;
+                byType[t.tradeType].pnl += t.pnl;
+                if (t.pnl > 0) byType[t.tradeType].wins++;
+
+                // By category
+                if (!byCategory[t.riskCategory]) byCategory[t.riskCategory] = { count: 0, pnl: 0, wins: 0 };
+                byCategory[t.riskCategory].count++;
+                byCategory[t.riskCategory].pnl += t.pnl;
+                if (t.pnl > 0) byCategory[t.riskCategory].wins++;
+
+                // By confidence
+                if (!byConfidence[t.confidence]) byConfidence[t.confidence] = { count: 0, pnl: 0, wins: 0 };
+                byConfidence[t.confidence].count++;
+                byConfidence[t.confidence].pnl += t.pnl;
+                if (t.pnl > 0) byConfidence[t.confidence].wins++;
+            });
+
+            document.getElementById('analysisGrid').innerHTML = `
+                <div class="analysis-card">
+                    <div class="analysis-title">Summary</div>
+                    <div class="analysis-item">
+                        <span class="analysis-label">Total Trades</span>
+                        <span class="analysis-value">${todaysTrades.length}</span>
+                    </div>
+                    <div class="analysis-item">
+                        <span class="analysis-label">Total P&L</span>
+                        <span class="analysis-value" style="color: ${totalPnl >= 0 ? '#22c55e' : '#ef4444'};">₹${totalPnl.toFixed(0)}</span>
+                    </div>
+                    <div class="analysis-item">
+                        <span class="analysis-label">Win Rate</span>
+                        <span class="analysis-value">${Math.round((wins.length / todaysTrades.length) * 100)}%</span>
+                    </div>
+                    <div class="analysis-item">
+                        <span class="analysis-label">Avg Win</span>
+                        <span class="analysis-value" style="color: #22c55e;">+₹${avgWin.toFixed(0)}</span>
+                    </div>
+                    <div class="analysis-item">
+                        <span class="analysis-label">Avg Loss</span>
+                        <span class="analysis-value" style="color: #ef4444;">₹${avgLoss.toFixed(0)}</span>
+                    </div>
                 </div>
-                <div class="analysis-item">
-                    <span class="analysis-label">SHORT: ${shorts.length} trades</span>
-                    <span class="analysis-value">${shorts.length > 0 ? Math.round((shorts.filter(t => t.pnl > 0).length / shorts.length) * 100) : 0}% Win</span>
+
+                <div class="analysis-card">
+                    <div class="analysis-title">By Trade Type</div>
+                    ${Object.entries(byType).map(([type, data]) => `
+                        <div class="analysis-item">
+                            <span class="analysis-label">${type}</span>
+                            <span class="analysis-value" style="color: ${data.pnl >= 0 ? '#22c55e' : '#ef4444'};">
+                                ${data.count} | ${Math.round((data.wins / data.count) * 100)}% | ${data.pnl >= 0 ? '+' : ''}₹${data.pnl.toFixed(0)}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="analysis-card">
+                    <div class="analysis-title">By Risk Category</div>
+                    ${Object.entries(byCategory).map(([cat, data]) => `
+                        <div class="analysis-item">
+                            <span class="analysis-label">${cat}</span>
+                            <span class="analysis-value" style="color: ${data.pnl >= 0 ? '#22c55e' : '#ef4444'};">
+                                ${data.count} | ${Math.round((data.wins / data.count) * 100)}% | ${data.pnl >= 0 ? '+' : ''}₹${data.pnl.toFixed(0)}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="analysis-card">
+                    <div class="analysis-title">By Confidence</div>
+                    ${Object.entries(byConfidence).map(([conf, data]) => `
+                        <div class="analysis-item">
+                            <span class="analysis-label">${conf}</span>
+                            <span class="analysis-value" style="color: ${data.pnl >= 0 ? '#22c55e' : '#ef4444'};">
+                                ${data.count} | ${Math.round((data.wins / data.count) * 100)}% | ${data.pnl >= 0 ? '+' : ''}₹${data.pnl.toFixed(0)}
+                            </span>
+                        </div>
+                    `).join('')}
                 </div>
             `;
-
-            // Risk category analysis
-            const categories = {};
-            todaysTrades.forEach(t => {
-                if (!categories[t.riskCategory]) categories[t.riskCategory] = { count: 0, pnl: 0 };
-                categories[t.riskCategory].count++;
-                categories[t.riskCategory].pnl += t.pnl;
-            });
-            document.getElementById('riskAnalysis').innerHTML = Object.entries(categories).map(([cat, data]) => `
-                <div class="analysis-item">
-                    <span class="analysis-label">${cat}: ${data.count}</span>
-                    <span class="analysis-value" style="color: ${data.pnl >= 0 ? '#22c55e' : '#ef4444'};">
-                        ${data.pnl >= 0 ? '+' : ''}₹${data.pnl.toFixed(0)}
-                    </span>
-                </div>
-            `).join('');
-
-            // Confidence analysis
-            const confidence = {};
-            todaysTrades.forEach(t => {
-                if (!confidence[t.confidence]) confidence[t.confidence] = { count: 0, pnl: 0 };
-                confidence[t.confidence].count++;
-                confidence[t.confidence].pnl += t.pnl;
-            });
-            document.getElementById('confAnalysis').innerHTML = Object.entries(confidence).map(([conf, data]) => `
-                <div class="analysis-item">
-                    <span class="analysis-label">${conf}: ${data.count}</span>
-                    <span class="analysis-value" style="color: ${data.pnl >= 0 ? '#22c55e' : '#ef4444'};">
-                        ${data.pnl >= 0 ? '+' : ''}₹${data.pnl.toFixed(0)}
-                    </span>
-                </div>
-            `).join('');
         }
 
-        // Load settings
+        // UPDATE HOME STATS
+        function updateHomeStats() {
+            const todaysTrades = getTodaysTrades();
+
+            if (todaysTrades.length === 0) {
+                document.getElementById('homeStats').innerHTML = `
+                    <div class="stat-card" style="grid-column: 1 / -1; text-align: center;">
+                        <div class="stat-label">No Trades Yet Today</div>
+                        <div style="color: #94a3b8; margin-top: 15px;">Ready to log your first trade?</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalPnl = todaysTrades.reduce((sum, t) => sum + t.pnl, 0);
+            const wins = todaysTrades.filter(t => t.pnl > 0).length;
+            const winRate = Math.round((wins / todaysTrades.length) * 100);
+            const largestWin = Math.max(...todaysTrades.map(t => t.pnl), 0);
+            const largestLoss = Math.min(...todaysTrades.map(t => t.pnl), 0);
+            const avgTrade = totalPnl / todaysTrades.length;
+
+            document.getElementById('homeStats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Today's P&L</div>
+                    <div class="stat-value" style="color: ${totalPnl >= 0 ? '#22c55e' : '#ef4444'};">
+                        ${totalPnl >= 0 ? '+' : ''}₹${totalPnl.toFixed(0)}
+                    </div>
+                    <div class="stat-subtitle">Net Profit/Loss</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Win Rate</div>
+                    <div class="stat-value stat-neutral">${winRate}%</div>
+                    <div class="stat-subtitle">${wins}/${todaysTrades.length} Winning Trades</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Largest Win</div>
+                    <div class="stat-value stat-positive">+₹${largestWin.toFixed(0)}</div>
+                    <div class="stat-subtitle">Best Single Trade</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Largest Loss</div>
+                    <div class="stat-value stat-negative">₹${largestLoss.toFixed(0)}</div>
+                    <div class="stat-subtitle">Worst Single Trade</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Avg Per Trade</div>
+                    <div class="stat-value stat-neutral">₹${avgTrade.toFixed(0)}</div>
+                    <div class="stat-subtitle">Average P&L</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Total Trades</div>
+                    <div class="stat-value stat-neutral">${todaysTrades.length}</div>
+                    <div class="stat-subtitle">Trades Today</div>
+                </div>
+            `;
+        }
+
+        // SETTINGS
         function loadSettings() {
+            document.getElementById('capitalInput').value = settings.capital;
+            document.getElementById('riskPercent').value = settings.riskPercent;
             document.getElementById('dailyLossLimit').value = settings.dailyLossLimit;
             document.getElementById('dailyProfitTarget').value = settings.dailyProfitTarget;
-            document.getElementById('maxTradesPerDay').value = settings.maxTradesPerDay;
-            document.getElementById('maxConsecutiveLosses').value = settings.maxConsecutiveLosses;
+            document.getElementById('maxTrades').value = settings.maxTrades;
+            document.getElementById('maxLosses').value = settings.maxLosses;
+            document.getElementById('capitalDisplay').textContent = settings.capital.toLocaleString('en-IN');
         }
 
-        // Save settings
         function saveSettings() {
+            settings.capital = parseFloat(document.getElementById('capitalInput').value) || 100000;
+            settings.riskPercent = parseFloat(document.getElementById('riskPercent').value) || 1;
             settings.dailyLossLimit = parseFloat(document.getElementById('dailyLossLimit').value) || 5000;
             settings.dailyProfitTarget = parseFloat(document.getElementById('dailyProfitTarget').value) || 10000;
-            settings.maxTradesPerDay = parseInt(document.getElementById('maxTradesPerDay').value) || 10;
-            settings.maxConsecutiveLosses = parseInt(document.getElementById('maxConsecutiveLosses').value) || 3;
+            settings.maxTrades = parseInt(document.getElementById('maxTrades').value) || 10;
+            settings.maxLosses = parseInt(document.getElementById('maxLosses').value) || 3;
 
             localStorage.setItem('settings', JSON.stringify(settings));
-            showMessage('Settings saved!', 'success');
+            loadSettings();
+            showMsg('Settings saved!', 'success');
         }
 
-        // Reset data
-        function resetData() {
-            if (confirm('Delete ALL trades? This cannot be undone!')) {
-                trades = [];
-                localStorage.setItem('trades', JSON.stringify(trades));
-                updateDashboard();
-                showMessage('All data deleted', 'success');
-            }
-        }
-
-        // Show message
-        function showMessage(text, type) {
-            const msg = document.getElementById('message');
-            msg.textContent = text;
-            msg.className = `message ${type} show`;
-            setTimeout(() => msg.classList.remove('show'), 3000);
-        }
-    </script>
-</body>
-</html>
+        
