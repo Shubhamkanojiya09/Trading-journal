@@ -3,36 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="StudyHub - Study Smarter, Not Harder. Your all-in-one platform for study notes, productivity tools, and exam preparation.">
-    <meta name="keywords" content="study tools, exam preparation, notes, pomodoro timer, study planner">
-    <meta name="author" content="StudyHub">
-    <meta property="og:title" content="StudyHub - Study Smarter, Not Harder">
-    <meta property="og:description" content="Complete study platform with notes, timers, and planning tools">
-    <meta property="og:type" content="website">
-    
+    <meta name="description" content="StudyHub - Study Smarter, Not Harder">
     <title>StudyHub - Study Smarter, Not Harder</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>📚</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- NAVBAR -->
     <nav class="navbar">
         <div class="container">
-            <div class="navbar-content">
-                <div class="logo">
-                    <span class="logo-icon">📚</span>
-                    <span class="logo-text">StudyHub</span>
-                </div>
-                <ul class="nav-links">
-                    <li><a href="#home" onclick="scrollToSection('home')">Home</a></li>
-                    <li><a href="#timer" onclick="scrollToSection('timer')">Timer</a></li>
-                    <li><a href="#planner" onclick="scrollToSection('planner')">Planner</a></li>
-                    <li><a href="#notes" onclick="scrollToSection('notes')">Notes</a></li>
-                    <li><a href="#premium" onclick="scrollToSection('premium')">Premium</a></li>
-                </ul>
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            <div class="logo">📚 StudyHub</div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#timer">Timer</a>
+                <a href="#planner">Planner</a>
+                <a href="#notes">Notes</a>
+                <a href="#premium">Premium</a>
             </div>
+            <button class="theme-btn" id="themeBtn">🌙</button>
         </div>
     </nav>
 
@@ -40,140 +28,119 @@
     <section id="home" class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1 class="hero-title">Study Smarter, Not Harder</h1>
-                <p class="hero-subtitle">Tools, notes and resources for serious students</p>
+                <h1>Study Smarter, Not Harder</h1>
+                <p>Tools, notes and resources for serious students</p>
                 <div class="hero-buttons">
-                    <button class="btn btn-primary" onclick="scrollToSection('timer')">Explore Tools</button>
-                    <button class="btn btn-secondary" onclick="scrollToSection('notes')">Download Notes</button>
+                    <button class="btn btn-primary" onclick="document.getElementById('timer').scrollIntoView({behavior:'smooth'})">Explore Tools</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('notes').scrollIntoView({behavior:'smooth'})">Download Notes</button>
                 </div>
-            </div>
-            <div class="hero-image">
-                <div class="hero-icon">🎓</div>
             </div>
         </div>
     </section>
 
-    <!-- QUICK STATS -->
-    <section class="quick-stats">
+    <!-- STATS SECTION -->
+    <section class="stats-section">
         <div class="container">
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-box">
                     <div class="stat-icon">⏱️</div>
-                    <div class="stat-time" id="currentTime">12:30 PM</div>
+                    <div class="stat-value" id="timeDisplay">12:00</div>
                     <div class="stat-label">Current Time</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-box">
                     <div class="stat-icon">🔥</div>
-                    <div class="stat-value" id="streakCount">0</div>
+                    <div class="stat-value" id="streakVal">0</div>
                     <div class="stat-label">Day Streak</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-box">
                     <div class="stat-icon">💡</div>
-                    <div class="stat-quote" id="dailyQuote">Loading...</div>
-                    <div class="stat-label">Daily Motivation</div>
+                    <div class="stat-value" id="quoteVal">Loading...</div>
+                    <div class="stat-label">Quote</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FEATURES SECTION -->
+    <!-- FEATURES -->
     <section class="features">
         <div class="container">
-            <h2 class="section-title">Why StudyHub?</h2>
+            <h2>Why StudyHub?</h2>
             <div class="features-grid">
-                <div class="feature-card">
+                <div class="feature-box">
                     <div class="feature-icon">📝</div>
                     <h3>Study Notes</h3>
-                    <p>Curated notes from top students and experts</p>
+                    <p>Curated notes from experts</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-box">
                     <div class="feature-icon">⏰</div>
                     <h3>Pomodoro Timer</h3>
-                    <p>Focus for 25 minutes, break for 5. Scientifically proven method.</p>
+                    <p>25 min focus, 5 min break</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-box">
                     <div class="feature-icon">📅</div>
                     <h3>Study Planner</h3>
-                    <p>Organize your study schedule and track progress</p>
+                    <p>Organize your schedule</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-box">
                     <div class="feature-icon">📚</div>
                     <h3>Exam Resources</h3>
-                    <p>Question banks, practice tests, and study guides</p>
+                    <p>Question banks & guides</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- POMODORO TIMER SECTION -->
+    <!-- TIMER SECTION -->
     <section id="timer" class="timer-section">
         <div class="container">
-            <h2 class="section-title">Focus Timer - Pomodoro Technique</h2>
+            <h2>Focus Timer - Pomodoro</h2>
             <div class="timer-card">
                 <div class="timer-display">
-                    <svg class="timer-circle" viewBox="0 0 200 200">
-                        <circle class="timer-circle-bg" cx="100" cy="100" r="95"></circle>
-                        <circle class="timer-circle-progress" id="timerProgress" cx="100" cy="100" r="95"></circle>
-                    </svg>
-                    <div class="timer-text">
-                        <span class="timer-time" id="timerDisplay">25:00</span>
-                        <span class="timer-mode" id="timerMode">Focus Time</span>
+                    <div class="timer-circle">
+                        <svg width="200" height="200" viewBox="0 0 200 200">
+                            <circle cx="100" cy="100" r="90" fill="none" stroke="#e0e0e0" stroke-width="8"></circle>
+                            <circle id="progress" cx="100" cy="100" r="90" fill="none" stroke="#6366f1" stroke-width="8" stroke-dasharray="565" stroke-dashoffset="565" stroke-linecap="round" style="transform: rotate(-90deg); transform-origin: 100px 100px;"></circle>
+                        </svg>
+                        <div class="timer-text">
+                            <div class="timer-time" id="timerDisplay">25:00</div>
+                            <div class="timer-mode" id="timerMode">Focus Time</div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="timer-controls">
                     <button class="btn btn-primary" id="startBtn" onclick="startTimer()">Start</button>
-                    <button class="btn btn-secondary" id="pauseBtn" onclick="pauseTimer()" style="display:none;">Pause</button>
+                    <button class="btn btn-secondary" id="pauseBtn" onclick="pauseTimer()" style="display:none">Pause</button>
                     <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
                 </div>
 
-                <div class="timer-stats">
-                    <div class="timer-stat">
-                        <span>Sessions Completed Today</span>
-                        <span id="sessionsCount">0</span>
-                    </div>
-                    <div class="timer-stat">
-                        <span>Total Focus Time</span>
-                        <span id="totalFocusTime">0h 0m</span>
-                    </div>
+                <div class="timer-info">
+                    <div>Sessions: <span id="sessionsCount">0</span></div>
+                    <div>Total Time: <span id="totalTimeDisplay">0h 0m</span></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- STUDY PLANNER SECTION -->
+    <!-- PLANNER SECTION -->
     <section id="planner" class="planner-section">
         <div class="container">
-            <h2 class="section-title">Study Planner</h2>
+            <h2>Study Planner</h2>
             <div class="planner-card">
-                <div class="add-task-form">
-                    <input type="text" id="taskInput" placeholder="Add a new study task..." class="task-input">
+                <div class="add-task">
+                    <input type="text" id="taskInput" placeholder="Add a new task..." class="task-input">
                     <input type="date" id="taskDate" class="task-date">
-                    <button class="btn btn-primary" onclick="addTask()">Add Task</button>
+                    <button class="btn btn-primary" onclick="addTask()">Add</button>
                 </div>
 
-                <div class="tasks-container">
-                    <div id="tasksList" class="tasks-list">
-                        <div class="empty-state">
-                            <span class="empty-icon">📋</span>
-                            <p>No tasks yet. Add one to get started!</p>
-                        </div>
-                    </div>
+                <div class="tasks-list" id="tasksList">
+                    <p style="text-align: center; color: #999;">No tasks yet. Add one to get started!</p>
                 </div>
 
                 <div class="planner-stats">
-                    <div class="stat">
-                        <span class="stat-number" id="totalTasks">0</span>
-                        <span class="stat-text">Total Tasks</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number" id="completedTasks">0</span>
-                        <span class="stat-text">Completed</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number" id="completionRate">0%</span>
-                        <span class="stat-text">Completion Rate</span>
-                    </div>
+                    <div><span id="totalTasksNum">0</span> Total</div>
+                    <div><span id="completedTasksNum">0</span> Done</div>
+                    <div><span id="completionPercent">0</span>% Complete</div>
                 </div>
             </div>
         </div>
@@ -182,42 +149,42 @@
     <!-- NOTES SECTION -->
     <section id="notes" class="notes-section">
         <div class="container">
-            <h2 class="section-title">Study Notes & Resources</h2>
+            <h2>Study Notes & Resources</h2>
             <div class="notes-grid">
                 <div class="note-card">
                     <div class="note-icon">📘</div>
-                    <h3>Mathematics - Algebra</h3>
-                    <p>Complete guide to algebraic equations and formulas</p>
+                    <h3>Math - Algebra</h3>
+                    <p>Complete guide to equations</p>
                     <button class="btn btn-outline" onclick="downloadNote('Math-Algebra')">Download PDF</button>
                 </div>
                 <div class="note-card">
                     <div class="note-icon">📗</div>
                     <h3>Physics - Mechanics</h3>
-                    <p>Laws of motion, energy, and work explained</p>
+                    <p>Laws of motion explained</p>
                     <button class="btn btn-outline" onclick="downloadNote('Physics-Mechanics')">Download PDF</button>
                 </div>
                 <div class="note-card">
                     <div class="note-icon">📙</div>
                     <h3>Chemistry - Organic</h3>
-                    <p>Organic reactions and molecular structures</p>
+                    <p>Reactions and structures</p>
                     <button class="btn btn-outline" onclick="downloadNote('Chemistry-Organic')">Download PDF</button>
                 </div>
                 <div class="note-card">
                     <div class="note-icon">📕</div>
                     <h3>Biology - Genetics</h3>
-                    <p>DNA, heredity, and genetic engineering</p>
+                    <p>DNA and heredity</p>
                     <button class="btn btn-outline" onclick="downloadNote('Biology-Genetics')">Download PDF</button>
                 </div>
                 <div class="note-card">
                     <div class="note-icon">📔</div>
                     <h3>English - Literature</h3>
-                    <p>Analysis of classic and modern literature</p>
+                    <p>Literary analysis guide</p>
                     <button class="btn btn-outline" onclick="downloadNote('English-Literature')">Download PDF</button>
                 </div>
                 <div class="note-card">
                     <div class="note-icon">📓</div>
                     <h3>History - Modern Era</h3>
-                    <p>Key events and personalities of the modern era</p>
+                    <p>Key events explained</p>
                     <button class="btn btn-outline" onclick="downloadNote('History-Modern')">Download PDF</button>
                 </div>
             </div>
@@ -227,156 +194,101 @@
     <!-- PREMIUM SECTION -->
     <section id="premium" class="premium-section">
         <div class="container">
-            <h2 class="section-title">Premium Resources</h2>
+            <h2>Premium Resources</h2>
             <div class="premium-grid">
                 <div class="premium-card">
-                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-badge">🔒</div>
                     <div class="premium-icon">📖</div>
-                    <h3>Complete Study Guides</h3>
-                    <p>Comprehensive notes for all major subjects</p>
+                    <h3>Study Guides</h3>
+                    <p>Comprehensive notes</p>
                     <div class="premium-price">₹199</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Study Guides')">Unlock Premium</button>
+                    <button class="btn btn-primary" onclick="unlockPremium('Study Guides')">Unlock</button>
                 </div>
                 <div class="premium-card">
-                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-badge">🔒</div>
                     <div class="premium-icon">🎯</div>
                     <h3>Exam Strategy</h3>
-                    <p>Advanced techniques to ace your exams</p>
+                    <p>Advanced techniques</p>
                     <div class="premium-price">₹199</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Exam Strategy')">Unlock Premium</button>
+                    <button class="btn btn-primary" onclick="unlockPremium('Exam Strategy')">Unlock</button>
                 </div>
                 <div class="premium-card">
-                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-badge">🔒</div>
                     <div class="premium-icon">💯</div>
                     <h3>Question Bank</h3>
-                    <p>1000+ practice questions with solutions</p>
+                    <p>1000+ questions</p>
                     <div class="premium-price">₹299</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Question Bank')">Unlock Premium</button>
+                    <button class="btn btn-primary" onclick="unlockPremium('Question Bank')">Unlock</button>
                 </div>
                 <div class="premium-card">
-                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-badge">🔒</div>
                     <div class="premium-icon">📝</div>
                     <h3>Mock Tests</h3>
-                    <p>Full-length mock tests with detailed analysis</p>
+                    <p>Full-length tests</p>
                     <div class="premium-price">₹399</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Mock Tests')">Unlock Premium</button>
+                    <button class="btn btn-primary" onclick="unlockPremium('Mock Tests')">Unlock</button>
                 </div>
                 <div class="premium-card">
-                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-badge">🔒</div>
                     <div class="premium-icon">👨‍🏫</div>
-                    <h3>1-on-1 Mentoring</h3>
-                    <p>Personal guidance from expert mentors</p>
+                    <h3>Mentoring</h3>
+                    <p>1-on-1 guidance</p>
                     <div class="premium-price">₹999</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Mentoring')">Unlock Premium</button>
+                    <button class="btn btn-primary" onclick="unlockPremium('Mentoring')">Unlock</button>
                 </div>
                 <div class="premium-card">
-                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-badge">🔒</div>
                     <div class="premium-icon">🎥</div>
                     <h3>Video Lectures</h3>
-                    <p>Recorded lectures by top educators</p>
+                    <p>Expert recordings</p>
                     <div class="premium-price">₹499</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Video Lectures')">Unlock Premium</button>
+                    <button class="btn btn-primary" onclick="unlockPremium('Video Lectures')">Unlock</button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- TESTIMONIALS SECTION -->
+    <!-- TESTIMONIALS -->
     <section class="testimonials">
         <div class="container">
-            <h2 class="section-title">What Students Say</h2>
+            <h2>What Students Say</h2>
             <div class="testimonials-grid">
                 <div class="testimonial-card">
-                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                    <p>"StudyHub helped me score 95% in my exams. The timer and planner features are game-changers!"</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">👩‍🎓</div>
-                        <div>
-                            <div class="author-name">Sarah Johnson</div>
-                            <div class="author-role">Student</div>
-                        </div>
-                    </div>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"StudyHub helped me score 95%! The timer is amazing."</p>
+                    <div class="author">👩‍🎓 Sarah Johnson</div>
                 </div>
                 <div class="testimonial-card">
-                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                    <p>"The notes and resources are incredibly well-organized. Saves me so much time searching for materials."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">👨‍🎓</div>
-                        <div>
-                            <div class="author-name">Mike Chen</div>
-                            <div class="author-role">Student</div>
-                        </div>
-                    </div>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"Best study platform ever. Notes are incredibly organized."</p>
+                    <div class="author">👨‍🎓 Mike Chen</div>
                 </div>
                 <div class="testimonial-card">
-                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                    <p>"Best platform for organized studying. I improved my focus and completed all my tasks on time."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">👩‍🏫</div>
-                        <div>
-                            <div class="author-name">Emma Davis</div>
-                            <div class="author-role">Educator</div>
-                        </div>
-                    </div>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"Improved my focus dramatically. Highly recommended!"</p>
+                    <div class="author">👩‍🏫 Emma Davis</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- NEWSLETTER SECTION -->
+    <!-- NEWSLETTER -->
     <section class="newsletter">
         <div class="container">
-            <div class="newsletter-content">
-                <h2>Get Weekly Study Resources</h2>
-                <p>Subscribe to get curated study materials and tips directly in your inbox</p>
-                <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
-                    <input type="email" id="emailInput" placeholder="Enter your email" required>
-                    <button type="submit" class="btn btn-primary">Subscribe</button>
-                </form>
-                <p class="newsletter-note" id="newsletterMessage"></p>
-            </div>
+            <h2>Get Weekly Study Resources</h2>
+            <p>Subscribe to get study tips and materials</p>
+            <form onsubmit="subscribeNewsletter(event)" class="newsletter-form">
+                <input type="email" id="emailInput" placeholder="Enter your email" required>
+                <button type="submit" class="btn btn-primary">Subscribe</button>
+            </form>
+            <p id="newsletterMsg" style="text-align:center; margin-top:10px;"></p>
         </div>
     </section>
 
     <!-- FOOTER -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-section">
-                    <h4>StudyHub</h4>
-                    <p>Your all-in-one platform for studying smarter</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#timer">Timer</a></li>
-                        <li><a href="#planner">Planner</a></li>
-                        <li><a href="#notes">Notes</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="#premium">Premium</a></li>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Privacy</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Follow Us</h4>
-                    <div class="social-links">
-                        <a href="#">Twitter</a>
-                        <a href="#">Instagram</a>
-                        <a href="#">LinkedIn</a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 StudyHub. All rights reserved.</p>
-                <p>Made with ❤️ for students</p>
-            </div>
+            <p>&copy; 2024 StudyHub. Made with ❤️ for students.</p>
         </div>
     </footer>
 
