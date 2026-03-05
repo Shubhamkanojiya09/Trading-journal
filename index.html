@@ -1,297 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="StudyHub - Study Smarter, Not Harder">
-    <title>StudyHub - Study Smarter, Not Harder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TradeSense - Indian Trader Dashboard</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+
+<style>
+
+body{
+font-family: Arial, Helvetica, sans-serif;
+background:#0f172a;
+color:white;
+margin:0;
+}
+
+header{
+background:#020617;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-bottom:1px solid #1e293b;
+}
+
+header h1{
+font-size:20px;
+}
+
+nav a{
+color:#38bdf8;
+margin-left:15px;
+text-decoration:none;
+}
+
+.container{
+display:grid;
+grid-template-columns:3fr 1fr;
+gap:20px;
+padding:20px;
+}
+
+.chart{
+background:#020617;
+padding:10px;
+border-radius:10px;
+}
+
+.tools{
+background:#020617;
+padding:20px;
+border-radius:10px;
+}
+
+input,select,button{
+width:100%;
+padding:10px;
+margin-top:10px;
+border-radius:6px;
+border:none;
+}
+
+button{
+background:#38bdf8;
+color:black;
+font-weight:bold;
+cursor:pointer;
+}
+
+.signal{
+margin-top:20px;
+padding:15px;
+background:#111827;
+border-radius:8px;
+}
+
+footer{
+text-align:center;
+padding:10px;
+font-size:12px;
+color:gray;
+}
+
+</style>
+
 </head>
+
 <body>
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="container">
-            <div class="logo">📚 StudyHub</div>
-            <div class="nav-links">
-                <a href="#home">Home</a>
-                <a href="#timer">Timer</a>
-                <a href="#planner">Planner</a>
-                <a href="#notes">Notes</a>
-                <a href="#premium">Premium</a>
-            </div>
-            <button class="theme-btn" id="themeBtn">🌙</button>
-        </div>
-    </nav>
 
-    <!-- HERO SECTION -->
-    <section id="home" class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Study Smarter, Not Harder</h1>
-                <p>Tools, notes and resources for serious students</p>
-                <div class="hero-buttons">
-                    <button class="btn btn-primary" onclick="document.getElementById('timer').scrollIntoView({behavior:'smooth'})">Explore Tools</button>
-                    <button class="btn btn-secondary" onclick="document.getElementById('notes').scrollIntoView({behavior:'smooth'})">Download Notes</button>
-                </div>
-            </div>
-        </div>
-    </section>
+<header>
 
-    <!-- STATS SECTION -->
-    <section class="stats-section">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-icon">⏱️</div>
-                    <div class="stat-value" id="timeDisplay">12:00</div>
-                    <div class="stat-label">Current Time</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon">🔥</div>
-                    <div class="stat-value" id="streakVal">0</div>
-                    <div class="stat-label">Day Streak</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon">💡</div>
-                    <div class="stat-value" id="quoteVal">Loading...</div>
-                    <div class="stat-label">Quote</div>
-                </div>
-            </div>
-        </div>
-    </section>
+<h1>TradeSense Dashboard</h1>
 
-    <!-- FEATURES -->
-    <section class="features">
-        <div class="container">
-            <h2>Why StudyHub?</h2>
-            <div class="features-grid">
-                <div class="feature-box">
-                    <div class="feature-icon">📝</div>
-                    <h3>Study Notes</h3>
-                    <p>Curated notes from experts</p>
-                </div>
-                <div class="feature-box">
-                    <div class="feature-icon">⏰</div>
-                    <h3>Pomodoro Timer</h3>
-                    <p>25 min focus, 5 min break</p>
-                </div>
-                <div class="feature-box">
-                    <div class="feature-icon">📅</div>
-                    <h3>Study Planner</h3>
-                    <p>Organize your schedule</p>
-                </div>
-                <div class="feature-box">
-                    <div class="feature-icon">📚</div>
-                    <h3>Exam Resources</h3>
-                    <p>Question banks & guides</p>
-                </div>
-            </div>
-        </div>
-    </section>
+<nav>
+<a href="#">Home</a>
+<a href="#">Strategy</a>
+<a href="#">Risk Calculator</a>
+</nav>
 
-    <!-- TIMER SECTION -->
-    <section id="timer" class="timer-section">
-        <div class="container">
-            <h2>Focus Timer - Pomodoro</h2>
-            <div class="timer-card">
-                <div class="timer-display">
-                    <div class="timer-circle">
-                        <svg width="200" height="200" viewBox="0 0 200 200">
-                            <circle cx="100" cy="100" r="90" fill="none" stroke="#e0e0e0" stroke-width="8"></circle>
-                            <circle id="progress" cx="100" cy="100" r="90" fill="none" stroke="#6366f1" stroke-width="8" stroke-dasharray="565" stroke-dashoffset="565" stroke-linecap="round" style="transform: rotate(-90deg); transform-origin: 100px 100px;"></circle>
-                        </svg>
-                        <div class="timer-text">
-                            <div class="timer-time" id="timerDisplay">25:00</div>
-                            <div class="timer-mode" id="timerMode">Focus Time</div>
-                        </div>
-                    </div>
-                </div>
+</header>
 
-                <div class="timer-controls">
-                    <button class="btn btn-primary" id="startBtn" onclick="startTimer()">Start</button>
-                    <button class="btn btn-secondary" id="pauseBtn" onclick="pauseTimer()" style="display:none">Pause</button>
-                    <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
-                </div>
 
-                <div class="timer-info">
-                    <div>Sessions: <span id="sessionsCount">0</span></div>
-                    <div>Total Time: <span id="totalTimeDisplay">0h 0m</span></div>
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="container">
 
-    <!-- PLANNER SECTION -->
-    <section id="planner" class="planner-section">
-        <div class="container">
-            <h2>Study Planner</h2>
-            <div class="planner-card">
-                <div class="add-task">
-                    <input type="text" id="taskInput" placeholder="Add a new task..." class="task-input">
-                    <input type="date" id="taskDate" class="task-date">
-                    <button class="btn btn-primary" onclick="addTask()">Add</button>
-                </div>
+<div class="chart">
 
-                <div class="tasks-list" id="tasksList">
-                    <p style="text-align: center; color: #999;">No tasks yet. Add one to get started!</p>
-                </div>
+<div id="tradingview_chart" style="height:500px;"></div>
 
-                <div class="planner-stats">
-                    <div><span id="totalTasksNum">0</span> Total</div>
-                    <div><span id="completedTasksNum">0</span> Done</div>
-                    <div><span id="completionPercent">0</span>% Complete</div>
-                </div>
-            </div>
-        </div>
-    </section>
+</div>
 
-    <!-- NOTES SECTION -->
-    <section id="notes" class="notes-section">
-        <div class="container">
-            <h2>Study Notes & Resources</h2>
-            <div class="notes-grid">
-                <div class="note-card">
-                    <div class="note-icon">📘</div>
-                    <h3>Math - Algebra</h3>
-                    <p>Complete guide to equations</p>
-                    <button class="btn btn-outline" onclick="downloadNote('Math-Algebra')">Download PDF</button>
-                </div>
-                <div class="note-card">
-                    <div class="note-icon">📗</div>
-                    <h3>Physics - Mechanics</h3>
-                    <p>Laws of motion explained</p>
-                    <button class="btn btn-outline" onclick="downloadNote('Physics-Mechanics')">Download PDF</button>
-                </div>
-                <div class="note-card">
-                    <div class="note-icon">📙</div>
-                    <h3>Chemistry - Organic</h3>
-                    <p>Reactions and structures</p>
-                    <button class="btn btn-outline" onclick="downloadNote('Chemistry-Organic')">Download PDF</button>
-                </div>
-                <div class="note-card">
-                    <div class="note-icon">📕</div>
-                    <h3>Biology - Genetics</h3>
-                    <p>DNA and heredity</p>
-                    <button class="btn btn-outline" onclick="downloadNote('Biology-Genetics')">Download PDF</button>
-                </div>
-                <div class="note-card">
-                    <div class="note-icon">📔</div>
-                    <h3>English - Literature</h3>
-                    <p>Literary analysis guide</p>
-                    <button class="btn btn-outline" onclick="downloadNote('English-Literature')">Download PDF</button>
-                </div>
-                <div class="note-card">
-                    <div class="note-icon">📓</div>
-                    <h3>History - Modern Era</h3>
-                    <p>Key events explained</p>
-                    <button class="btn btn-outline" onclick="downloadNote('History-Modern')">Download PDF</button>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- PREMIUM SECTION -->
-    <section id="premium" class="premium-section">
-        <div class="container">
-            <h2>Premium Resources</h2>
-            <div class="premium-grid">
-                <div class="premium-card">
-                    <div class="premium-badge">🔒</div>
-                    <div class="premium-icon">📖</div>
-                    <h3>Study Guides</h3>
-                    <p>Comprehensive notes</p>
-                    <div class="premium-price">₹199</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Study Guides')">Unlock</button>
-                </div>
-                <div class="premium-card">
-                    <div class="premium-badge">🔒</div>
-                    <div class="premium-icon">🎯</div>
-                    <h3>Exam Strategy</h3>
-                    <p>Advanced techniques</p>
-                    <div class="premium-price">₹199</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Exam Strategy')">Unlock</button>
-                </div>
-                <div class="premium-card">
-                    <div class="premium-badge">🔒</div>
-                    <div class="premium-icon">💯</div>
-                    <h3>Question Bank</h3>
-                    <p>1000+ questions</p>
-                    <div class="premium-price">₹299</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Question Bank')">Unlock</button>
-                </div>
-                <div class="premium-card">
-                    <div class="premium-badge">🔒</div>
-                    <div class="premium-icon">📝</div>
-                    <h3>Mock Tests</h3>
-                    <p>Full-length tests</p>
-                    <div class="premium-price">₹399</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Mock Tests')">Unlock</button>
-                </div>
-                <div class="premium-card">
-                    <div class="premium-badge">🔒</div>
-                    <div class="premium-icon">👨‍🏫</div>
-                    <h3>Mentoring</h3>
-                    <p>1-on-1 guidance</p>
-                    <div class="premium-price">₹999</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Mentoring')">Unlock</button>
-                </div>
-                <div class="premium-card">
-                    <div class="premium-badge">🔒</div>
-                    <div class="premium-icon">🎥</div>
-                    <h3>Video Lectures</h3>
-                    <p>Expert recordings</p>
-                    <div class="premium-price">₹499</div>
-                    <button class="btn btn-primary" onclick="unlockPremium('Video Lectures')">Unlock</button>
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="tools">
 
-    <!-- TESTIMONIALS -->
-    <section class="testimonials">
-        <div class="container">
-            <h2>What Students Say</h2>
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
-                    <p>"StudyHub helped me score 95%! The timer is amazing."</p>
-                    <div class="author">👩‍🎓 Sarah Johnson</div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
-                    <p>"Best study platform ever. Notes are incredibly organized."</p>
-                    <div class="author">👨‍🎓 Mike Chen</div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
-                    <p>"Improved my focus dramatically. Highly recommended!"</p>
-                    <div class="author">👩‍🏫 Emma Davis</div>
-                </div>
-            </div>
-        </div>
-    </section>
+<h3>Trade Setup</h3>
 
-    <!-- NEWSLETTER -->
-    <section class="newsletter">
-        <div class="container">
-            <h2>Get Weekly Study Resources</h2>
-            <p>Subscribe to get study tips and materials</p>
-            <form onsubmit="subscribeNewsletter(event)" class="newsletter-form">
-                <input type="email" id="emailInput" placeholder="Enter your email" required>
-                <button type="submit" class="btn btn-primary">Subscribe</button>
-            </form>
-            <p id="newsletterMsg" style="text-align:center; margin-top:10px;"></p>
-        </div>
-    </section>
+<label>Stock / Index</label>
+<select id="symbol">
+<option value="NSE:NIFTY">NIFTY</option>
+<option value="NSE:BANKNIFTY">BANKNIFTY</option>
+<option value="NSE:RELIANCE">RELIANCE</option>
+<option value="NSE:TCS">TCS</option>
+</select>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 StudyHub. Made with ❤️ for students.</p>
-        </div>
-    </footer>
+<label>Entry Price</label>
+<input type="number" id="entry">
 
-    <script src="script.js"></script>
+<label>Stop Loss</label>
+<input type="number" id="sl">
+
+<label>Target</label>
+<input type="number" id="target">
+
+<button onclick="calculateTrade()">Analyse Trade</button>
+
+<div class="signal" id="result">
+
+Waiting for trade setup...
+
+</div>
+
+</div>
+
+</div>
+
+<footer>
+
+For educational purposes only. Trading involves risk.
+
+</footer>
+
+
+<script>
+
+new TradingView.widget({
+container_id: "tradingview_chart",
+autosize: true,
+symbol: "NSE:NIFTY",
+interval: "5",
+timezone: "Asia/Kolkata",
+theme: "dark",
+style: "1",
+toolbar_bg: "#0f172a",
+enable_publishing: false,
+hide_top_toolbar: false,
+withdateranges: true,
+studies: ["RSI@tv-basicstudies","MACD@tv-basicstudies"]
+});
+
+
+function calculateTrade(){
+
+let entry=document.getElementById("entry").value;
+let sl=document.getElementById("sl").value;
+let target=document.getElementById("target").value;
+
+let risk = entry-sl;
+let reward = target-entry;
+
+let rr = (reward/risk).toFixed(2);
+
+let signal="";
+
+if(rr>=2){
+
+signal="Strong Trade Setup ✅<br>Risk Reward: 1:"+rr;
+
+}else{
+
+signal="Weak Setup ⚠️<br>Risk Reward: 1:"+rr;
+
+}
+
+document.getElementById("result").innerHTML=signal;
+
+}
+
+</script>
+
 </body>
+
 </html>
