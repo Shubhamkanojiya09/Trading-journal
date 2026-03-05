@@ -3,865 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAMastery - CA Study Platform</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            min-height: 100vh;
-        }
-
-        .navbar {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid white;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .nav-btn:hover, .nav-btn.active {
-            background: white;
-            color: #667eea;
-        }
-
-        .streak-display {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .tab {
-            display: none;
-        }
-
-        .tab.active {
-            display: block;
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            color: #333;
-        }
-
-        .card-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #666;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            font-family: inherit;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: #667eea;
-            outline: none;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(17, 153, 142, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(235, 51, 73, 0.4);
-        }
-
-        .btn-secondary {
-            background: #999;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #777;
-        }
-
-        .quote-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .quote-text {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-style: italic;
-        }
-
-        .quote-author {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            color: #333;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-icon {
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .reading-box {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .reading-content {
-            background: white;
-            color: #333;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 15px;
-            line-height: 1.6;
-        }
-
-        .session-log {
-            background: #f8f8f8;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border-left: 5px solid #667eea;
-            color: #333;
-        }
-
-        .session-log-title {
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .session-log-time {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .session-timer {
-            font-size: 48px;
-            font-weight: bold;
-            text-align: center;
-            color: #667eea;
-            font-family: 'Courier New', monospace;
-            margin: 20px 0;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-
-        .empty-msg {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
-        @media (max-width: 768px) {
-            .nav-buttons {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .nav-btn {
-                width: 100%;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .quote-text {
-                font-size: 18px;
-            }
-        }
-    </style>
+    <meta name="description" content="StudyHub - Study Smarter, Not Harder. Your all-in-one platform for study notes, productivity tools, and exam preparation.">
+    <meta name="keywords" content="study tools, exam preparation, notes, pomodoro timer, study planner">
+    <meta name="author" content="StudyHub">
+    <meta property="og:title" content="StudyHub - Study Smarter, Not Harder">
+    <meta property="og:description" content="Complete study platform with notes, timers, and planning tools">
+    <meta property="og:type" content="website">
+    
+    <title>StudyHub - Study Smarter, Not Harder</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>📚</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- NAVBAR -->
-    <div class="navbar">
-        <div class="logo">📚 CAMastery</div>
-        <div class="nav-buttons">
-            <button class="nav-btn active" onclick="switchTab('setup')">Setup</button>
-            <button class="nav-btn" onclick="switchTab('home')">Dashboard</button>
-            <button class="nav-btn" onclick="switchTab('session')">Study</button>
-            <button class="nav-btn" onclick="switchTab('logs')">History</button>
-            <button class="nav-btn" onclick="switchTab('accountability')">Progress</button>
-        </div>
-        <div class="streak-display">🔥 Streak: <span id="streakNum">0</span> days</div>
-    </div>
-
-    <div class="container">
-        <!-- SETUP TAB -->
-        <div id="setup" class="tab active">
-            <div class="card" style="max-width: 500px; margin: 50px auto;">
-                <div class="card-title" style="text-align: center;">👋 Welcome to CAMastery</div>
-                <p style="text-align: center; color: #666; margin-bottom: 20px;">Let's set up your profile first</p>
-
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="userName" placeholder="Your name">
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="logo">
+                    <span class="logo-icon">📚</span>
+                    <span class="logo-text">StudyHub</span>
                 </div>
-
-                <div class="form-group">
-                    <label>CA Level</label>
-                    <select id="userLevel">
-                        <option value="">Select level</option>
-                        <option value="Inter">CA Inter</option>
-                        <option value="Final">CA Final</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Daily Study Goal (hours)</label>
-                    <input type="number" id="userGoal" value="4" min="1" max="12">
-                </div>
-
-                <div class="form-group">
-                    <label>Weakest Subject</label>
-                    <select id="userSubject">
-                        <option value="">Select subject</option>
-                        <option value="Accounting">Accounting</option>
-                        <option value="Audit">Audit</option>
-                        <option value="Law">Law</option>
-                        <option value="Tax">Tax</option>
-                        <option value="FM">Financial Management</option>
-                    </select>
-                </div>
-
-                <button class="btn btn-primary" style="width: 100%;" onclick="saveProfile()">Start Learning 🚀</button>
+                <ul class="nav-links">
+                    <li><a href="#home" onclick="scrollToSection('home')">Home</a></li>
+                    <li><a href="#timer" onclick="scrollToSection('timer')">Timer</a></li>
+                    <li><a href="#planner" onclick="scrollToSection('planner')">Planner</a></li>
+                    <li><a href="#notes" onclick="scrollToSection('notes')">Notes</a></li>
+                    <li><a href="#premium" onclick="scrollToSection('premium')">Premium</a></li>
+                </ul>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
             </div>
         </div>
+    </nav>
 
-        <!-- HOME TAB -->
-        <div id="home" class="tab">
-            <div class="quote-section">
-                <div class="quote-text" id="quoteText">"Success is the sum of small efforts repeated day in and day out."</div>
-                <div class="quote-author" id="quoteAuthor">— Robert Collier</div>
-                <button class="btn btn-primary" style="margin-top: 15px;" onclick="nextQuote()">Next Quote</button>
-            </div>
-
-            <div class="reading-box">
-                <h3>📖 Daily Reading Task - Must Read Today!</h3>
-                <div class="reading-content">
-                    <h4 style="color: #667eea; margin-bottom: 10px;" id="readingTitle">Loading...</h4>
-                    <p id="readingText">Loading today's reading...</p>
-                    <p style="margin-top: 15px; font-size: 12px; color: #999;" id="readingSource">From "The Daily Book of Positive Quotations" by Linda Picone</p>
+    <!-- HERO SECTION -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Study Smarter, Not Harder</h1>
+                <p class="hero-subtitle">Tools, notes and resources for serious students</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="scrollToSection('timer')">Explore Tools</button>
+                    <button class="btn btn-secondary" onclick="scrollToSection('notes')">Download Notes</button>
                 </div>
-                <button class="btn btn-primary" style="margin-top: 15px; width: 100%;" onclick="markReadingDone()">✓ Mark as Read</button>
             </div>
+            <div class="hero-image">
+                <div class="hero-icon">🎓</div>
+            </div>
+        </div>
+    </section>
 
+    <!-- QUICK STATS -->
+    <section class="quick-stats">
+        <div class="container">
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon">⏱️</div>
-                    <div class="stat-label">Today's Study Time</div>
-                    <div class="stat-value" id="todayHours">0h 0m</div>
+                    <div class="stat-time" id="currentTime">12:30 PM</div>
+                    <div class="stat-label">Current Time</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">📚</div>
-                    <div class="stat-label">Total Hours</div>
-                    <div class="stat-value" id="totalHours">0h</div>
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value" id="streakCount">0</div>
+                    <div class="stat-label">Day Streak</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">✅</div>
-                    <div class="stat-label">Sessions Today</div>
-                    <div class="stat-value" id="todaySessions">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🎯</div>
-                    <div class="stat-label">Daily Goal</div>
-                    <div class="stat-value" id="goalDisplay">4h</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">💪 Your Motivation Today</div>
-                <p id="motivationMsg" style="font-size: 18px; color: #667eea; text-align: center; font-weight: bold;">Keep pushing! You're closer than yesterday.</p>
-            </div>
-        </div>
-
-        <!-- STUDY SESSION TAB -->
-        <div id="session" class="tab">
-            <div class="card">
-                <div class="card-title">⏰ Study Session Timer</div>
-                
-                <div class="session-timer" id="timer">00:00:00</div>
-
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Subject</label>
-                        <select id="sessionSubject">
-                            <option value="">Choose subject</option>
-                            <option value="Accounting">Accounting</option>
-                            <option value="Audit">Audit</option>
-                            <option value="Law">Law</option>
-                            <option value="Tax">Tax</option>
-                            <option value="FM">Financial Management</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Topic</label>
-                        <input type="text" id="sessionTopic" placeholder="e.g., Partnership Accounts">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Study Mode</label>
-                        <select id="studyMode">
-                            <option value="">Select mode</option>
-                            <option value="Theory">Theory</option>
-                            <option value="Practice">Practice</option>
-                            <option value="Revision">Revision</option>
-                            <option value="Mock">Mock Test</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Difficulty</label>
-                        <select id="difficulty">
-                            <option value="">Select level</option>
-                            <option value="Easy">Easy</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Hard">Hard</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>What will you study in this session?</label>
-                    <textarea id="sessionNotes" placeholder="Describe your study plan..." rows="3"></textarea>
-                </div>
-
-                <div>
-                    <button class="btn btn-success" onclick="startTimer()">▶ Start</button>
-                    <button class="btn btn-secondary" onclick="pauseTimer()">⏸ Pause</button>
-                    <button class="btn btn-danger" onclick="stopTimer()">⏹ End Session</button>
-                </div>
-
-                <div id="timerStatus" style="display: none; margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 5px; color: #2e7d32; text-align: center; font-weight: bold;">
-                    ✅ Session is running... Keep studying! 📚
+                    <div class="stat-icon">💡</div>
+                    <div class="stat-quote" id="dailyQuote">Loading...</div>
+                    <div class="stat-label">Daily Motivation</div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- LOGS TAB -->
-        <div id="logs" class="tab">
-            <div class="card">
-                <div class="card-title">📋 Your Study Sessions</div>
-                <div id="logsList"></div>
-            </div>
-
-            <div class="card" style="margin-top: 30px;">
-                <div class="card-title">🔄 Daily Revision - What You Studied Today</div>
-                <div id="revisionList"></div>
+    <!-- FEATURES SECTION -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Why StudyHub?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Study Notes</h3>
+                    <p>Curated notes from top students and experts</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3>Pomodoro Timer</h3>
+                    <p>Focus for 25 minutes, break for 5. Scientifically proven method.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h3>Study Planner</h3>
+                    <p>Organize your study schedule and track progress</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Exam Resources</h3>
+                    <p>Question banks, practice tests, and study guides</p>
+                </div>
             </div>
         </div>
+    </section>
 
-        <!-- ACCOUNTABILITY TAB -->
-        <div id="accountability" class="tab">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-label">Days Studied This Week</div>
-                    <div class="stat-value" id="daysThisWeek">0/7</div>
+    <!-- POMODORO TIMER SECTION -->
+    <section id="timer" class="timer-section">
+        <div class="container">
+            <h2 class="section-title">Focus Timer - Pomodoro Technique</h2>
+            <div class="timer-card">
+                <div class="timer-display">
+                    <svg class="timer-circle" viewBox="0 0 200 200">
+                        <circle class="timer-circle-bg" cx="100" cy="100" r="95"></circle>
+                        <circle class="timer-circle-progress" id="timerProgress" cx="100" cy="100" r="95"></circle>
+                    </svg>
+                    <div class="timer-text">
+                        <span class="timer-time" id="timerDisplay">25:00</span>
+                        <span class="timer-mode" id="timerMode">Focus Time</span>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⏳</div>
-                    <div class="stat-label">Weekly Study Hours</div>
-                    <div class="stat-value" id="weeklyHours">0h</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📈</div>
-                    <div class="stat-label">Monthly Progress</div>
-                    <div class="stat-value" id="monthlyProgress">0%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🏆</div>
-                    <div class="stat-label">Total Days Active</div>
-                    <div class="stat-value" id="totalDaysActive">0</div>
-                </div>
-            </div>
 
-            <div class="card">
-                <div class="card-title">📚 Subject-wise Study Time</div>
-                <div id="subjectBreakdown"></div>
-            </div>
+                <div class="timer-controls">
+                    <button class="btn btn-primary" id="startBtn" onclick="startTimer()">Start</button>
+                    <button class="btn btn-secondary" id="pauseBtn" onclick="pauseTimer()" style="display:none;">Pause</button>
+                    <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
+                </div>
 
-            <div class="card">
-                <div class="card-title">🎖️ Achievements</div>
-                <div id="achievementsList"></div>
+                <div class="timer-stats">
+                    <div class="timer-stat">
+                        <span>Sessions Completed Today</span>
+                        <span id="sessionsCount">0</span>
+                    </div>
+                    <div class="timer-stat">
+                        <span>Total Focus Time</span>
+                        <span id="totalFocusTime">0h 0m</span>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <script>
-        // DATA & VARIABLES
-        const quotes = [
-            { text: "Success is the sum of small efforts repeated day in and day out.", author: "Robert Collier" },
-            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-            { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
-            { text: "Every expert was once a beginner.", author: "Unknown" },
-            { text: "Success usually comes to those who are too busy to be looking for it.", author: "Henry David Thoreau" },
-            { text: "The pain of discipline weighs ounces while the pain of regret weighs tons.", author: "Jim Rohn" },
-            { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
-            { text: "Your limitation is only your imagination.", author: "Unknown" },
-            { text: "I can't give up because I'm not a quitter.", author: "Unknown" },
-            { text: "The best time to study is now.", author: "Unknown" }
-        ];
-
-        const dailyReadings = [
-            { title: "The Power of Consistency", text: "Success is not about making grand gestures or working for 12 hours straight. It's about showing up every single day, even when you don't feel like it. Every hour you study today compounds with every hour you studied yesterday. This is how great CAs are made - through consistent, disciplined effort over months and years." },
-            { title: "You Are Capable of Great Things", text: "Look at where you started and where you are now. Every concept that seemed impossible is now clear. This proves your incredible potential. Don't doubt yourself. You have the intelligence, the dedication, and the will to succeed. Your CA journey will make you unstoppable in your career." },
-            { title: "Embrace the Challenge", text: "The subjects that challenge you most are your greatest opportunities to grow. When you solve a difficult problem, your brain forms new neural connections. You're literally becoming smarter. These are not obstacles - they are stepping stones to excellence." },
-            { title: "Your Future Depends on Your Choices Today", text: "Every hour you choose to study today is an investment in your future self. Future you will be incredibly grateful for the sacrifices you're making right now. Remember why you started. Keep that vision alive. Your discipline today determines your success tomorrow." },
-            { title: "You Are Not Alone", text: "Thousands of CA aspirants are on this journey with you. Many have felt what you're feeling right now - doubt, exhaustion, frustration. And they pushed through. You can too. Your support system - family, friends, teachers - believes in you. Make them proud. More importantly, make yourself proud." },
-            { title: "Focus on Progress, Not Perfection", text: "You don't need to be perfect. You just need to be better than yesterday. If you understand one more concept today than yesterday, that's a win. If you solve one more problem correctly, that's progress. Celebrate these small wins. They compound into extraordinary results." },
-            { title: "Discipline Over Motivation", text: "Motivation is temporary, but discipline is permanent. There will be days when you don't feel like studying. This is when discipline kicks in. Create a study routine and stick to it regardless of how you feel. Once you start, motivation will follow." },
-            { title: "Your Past Doesn't Define Your Future", text: "If you struggled in previous exams, don't let that define you. If you failed a test, that's data, not destiny. Every day is a new opportunity to get better. The CA exams test your cumulative knowledge and your dedication - and both can improve dramatically with focused effort." }
-        ];
-
-        let userData = {
-            name: localStorage.getItem('userName') || '',
-            level: localStorage.getItem('userLevel') || '',
-            goal: parseInt(localStorage.getItem('userGoal')) || 4,
-            subject: localStorage.getItem('userSubject') || '',
-            setupDone: localStorage.getItem('setupDone') === 'true'
-        };
-
-        let sessions = JSON.parse(localStorage.getItem('sessions')) || [];
-        let timerRunning = false;
-        let timerSeconds = 0;
-        let timerInterval = null;
-        let sessionStartTime = null;
-
-        // INIT
-        window.addEventListener('load', () => {
-            if (!userData.setupDone) {
-                switchTab('setup');
-            } else {
-                switchTab('home');
-                updateDashboard();
-            }
-        });
-
-        // SAVE PROFILE
-        function saveProfile() {
-            const name = document.getElementById('userName').value;
-            const level = document.getElementById('userLevel').value;
-            const goal = document.getElementById('userGoal').value;
-            const subject = document.getElementById('userSubject').value;
-
-            if (!name || !level || !goal || !subject) {
-                alert('Please fill all fields!');
-                return;
-            }
-
-            userData = { name, level, goal: parseInt(goal), subject, setupDone: true };
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userLevel', level);
-            localStorage.setItem('userGoal', goal);
-            localStorage.setItem('userSubject', subject);
-            localStorage.setItem('setupDone', 'true');
-            localStorage.setItem('accountCreated', new Date().toISOString());
-
-            alert(`Welcome ${name}! Let's start your CA journey! 🚀`);
-            switchTab('home');
-        }
-
-        // SWITCH TABS
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-
-            if (tabName === 'home') updateDashboard();
-            if (tabName === 'logs') displayLogs();
-            if (tabName === 'accountability') displayAccountability();
-        }
-
-        // QUOTES
-        function displayQuote() {
-            const today = new Date().getDate();
-            const quote = quotes[today % quotes.length];
-            document.getElementById('quoteText').textContent = `"${quote.text}"`;
-            document.getElementById('quoteAuthor').textContent = `— ${quote.author}`;
-        }
-
-        function nextQuote() {
-            const random = quotes[Math.floor(Math.random() * quotes.length)];
-            document.getElementById('quoteText').textContent = `"${random.text}"`;
-            document.getElementById('quoteAuthor').textContent = `— ${random.author}`;
-        }
-
-        // READING
-        function displayReading() {
-            const today = new Date().getDate();
-            const reading = dailyReadings[today % dailyReadings.length];
-            document.getElementById('readingTitle').textContent = reading.title;
-            document.getElementById('readingText').textContent = reading.text;
-        }
-
-        function markReadingDone() {
-            const today = new Date().toISOString().split('T')[0];
-            let readings = JSON.parse(localStorage.getItem('readings')) || [];
-            if (!readings.includes(today)) {
-                readings.push(today);
-                localStorage.setItem('readings', JSON.stringify(readings));
-                alert('✅ Great! Daily reading marked complete. Keep the discipline!');
-            } else {
-                alert('You already marked today\'s reading. Consistency is key!');
-            }
-        }
-
-        // TIMER
-        function startTimer() {
-            const subject = document.getElementById('sessionSubject').value;
-            if (!subject) {
-                alert('Please select a subject!');
-                return;
-            }
-
-            timerRunning = true;
-            sessionStartTime = Date.now();
-            document.getElementById('timerStatus').style.display = 'block';
-            document.getElementById('sessionSubject').disabled = true;
-
-            timerInterval = setInterval(() => {
-                timerSeconds++;
-                const hrs = Math.floor(timerSeconds / 3600);
-                const mins = Math.floor((timerSeconds % 3600) / 60);
-                const secs = timerSeconds % 60;
-                document.getElementById('timer').textContent = 
-                    `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        function pauseTimer() {
-            timerRunning = false;
-            clearInterval(timerInterval);
-            alert('Session paused. Click Start to resume!');
-        }
-
-        function stopTimer() {
-            if (timerSeconds === 0) {
-                alert('No session to end!');
-                return;
-            }
-
-            clearInterval(timerInterval);
-            timerRunning = false;
-
-            const hours = Math.floor(timerSeconds / 3600);
-            const mins = Math.floor((timerSeconds % 3600) / 60);
-
-            const session = {
-                date: new Date().toISOString().split('T')[0],
-                time: new Date().toLocaleTimeString(),
-                subject: document.getElementById('sessionSubject').value,
-                topic: document.getElementById('sessionTopic').value,
-                mode: document.getElementById('studyMode').value,
-                difficulty: document.getElementById('difficulty').value,
-                notes: document.getElementById('sessionNotes').value,
-                duration: timerSeconds
-            };
-
-            sessions.push(session);
-            localStorage.setItem('sessions', JSON.stringify(sessions));
-
-            alert(`✅ Session saved! You studied for ${hours}h ${mins}m`);
-
-            // RESET
-            document.getElementById('timer').textContent = '00:00:00';
-            document.getElementById('timerStatus').style.display = 'none';
-            document.getElementById('sessionSubject').disabled = false;
-            document.getElementById('sessionSubject').value = '';
-            document.getElementById('sessionTopic').value = '';
-            document.getElementById('studyMode').value = '';
-            document.getElementById('difficulty').value = '';
-            document.getElementById('sessionNotes').value = '';
-            timerSeconds = 0;
-
-            updateDashboard();
-            checkStreak();
-        }
-
-        // DISPLAY LOGS
-        function displayLogs() {
-            const today = new Date().toISOString().split('T')[0];
-            const todaySessions = sessions.filter(s => s.date === today);
-
-            const logsList = document.getElementById('logsList');
-            if (todaySessions.length === 0) {
-                logsList.innerHTML = '<div class="empty-msg">📭 No sessions logged yet. Start studying!</div>';
-            } else {
-                logsList.innerHTML = todaySessions.map(s => `
-                    <div class="session-log">
-                        <div class="session-log-title">${s.subject} - ${s.topic}</div>
-                        <div class="session-log-time">${s.time} | ${Math.floor(s.duration / 3600)}h ${Math.floor((s.duration % 3600) / 60)}m</div>
-                        <div style="margin-top: 10px; color: #666; font-size: 13px;">Mode: ${s.mode} | Difficulty: ${s.difficulty}</div>
-                        ${s.notes ? `<div style="margin-top: 10px; padding: 10px; background: white; border-radius: 5px; font-size: 13px;">${s.notes}</div>` : ''}
-                    </div>
-                `).join('');
-            }
-
-            // REVISION
-            const revisionList = document.getElementById('revisionList');
-            if (todaySessions.length === 0) {
-                revisionList.innerHTML = '<div class="empty-msg">Start a session first to see revision tasks!</div>';
-            } else {
-                revisionList.innerHTML = '<p style="color: #666; margin-bottom: 15px;">📌 Revise these topics daily to strengthen your concepts:</p>' + 
-                todaySessions.map(s => `
-                    <div class="session-log" style="background: #f0f0ff;">
-                        <strong>${s.topic}</strong> (${s.subject})
-                        <div style="font-size: 12px; color: #999; margin-top: 5px;">⏰ Study this for 15-20 minutes daily</div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // DISPLAY ACCOUNTABILITY
-        function displayAccountability() {
-            const allDates = {};
-            sessions.forEach(s => {
-                if (!allDates[s.date]) allDates[s.date] = 0;
-                allDates[s.date] += s.duration;
-            });
-
-            const thisWeek = new Date();
-            thisWeek.setDate(thisWeek.getDate() - 7);
-            let weekCount = 0;
-            let weekHours = 0;
-
-            Object.keys(allDates).forEach(date => {
-                if (new Date(date) >= thisWeek) {
-                    weekCount++;
-                    weekHours += allDates[date];
-                }
-            });
-
-            document.getElementById('daysThisWeek').textContent = `${weekCount}/7`;
-            document.getElementById('weeklyHours').textContent = `${(weekHours / 3600).toFixed(1)}h`;
-
-            const monthHours = Object.values(allDates).reduce((a, b) => a + b, 0) / 3600;
-            const monthTarget = userData.goal * 30;
-            document.getElementById('monthlyProgress').textContent = `${Math.min(Math.round((monthHours / monthTarget) * 100), 100)}%`;
-            document.getElementById('totalDaysActive').textContent = Object.keys(allDates).length;
-
-            // Subject breakdown
-            const subjects = {};
-            sessions.forEach(s => {
-                if (!subjects[s.subject]) subjects[s.subject] = 0;
-                subjects[s.subject] += s.duration;
-            });
-
-            const breakdown = document.getElementById('subjectBreakdown');
-            breakdown.innerHTML = Object.entries(subjects).map(([subj, dur]) => `
-                <div style="padding: 10px; background: #f5f5f5; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="color: #333; font-weight: bold;">${subj}</span>
-                    <span style="color: #667eea; font-weight: bold;">${(dur / 3600).toFixed(1)}h</span>
+    <!-- STUDY PLANNER SECTION -->
+    <section id="planner" class="planner-section">
+        <div class="container">
+            <h2 class="section-title">Study Planner</h2>
+            <div class="planner-card">
+                <div class="add-task-form">
+                    <input type="text" id="taskInput" placeholder="Add a new study task..." class="task-input">
+                    <input type="date" id="taskDate" class="task-date">
+                    <button class="btn btn-primary" onclick="addTask()">Add Task</button>
                 </div>
-            `).join('');
 
-            // Achievements
-            const achievements = document.getElementById('achievementsList');
-            let achievementText = '';
-            if (weekCount >= 5) achievementText += '🏆 Consistent Learner - Studied 5+ days this week<br>';
-            if (monthHours >= monthTarget) achievementText += '🌟 Monthly Champion - Hit your monthly goal!<br>';
-            if (weekHours >= 20) achievementText += '💪 Beast Mode - 20+ hours this week!<br>';
-            if (Object.keys(allDates).length >= 30) achievementText += '🔥 30 Day Streak - One Month of Dedication!<br>';
-            
-            achievements.innerHTML = achievementText || '<p style="color: #999;">Keep studying to unlock achievements!</p>';
-        }
+                <div class="tasks-container">
+                    <div id="tasksList" class="tasks-list">
+                        <div class="empty-state">
+                            <span class="empty-icon">📋</span>
+                            <p>No tasks yet. Add one to get started!</p>
+                        </div>
+                    </div>
+                </div>
 
-        // UPDATE DASHBOARD
-        function updateDashboard() {
-            displayQuote();
-            displayReading();
+                <div class="planner-stats">
+                    <div class="stat">
+                        <span class="stat-number" id="totalTasks">0</span>
+                        <span class="stat-text">Total Tasks</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="completedTasks">0</span>
+                        <span class="stat-text">Completed</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="completionRate">0%</span>
+                        <span class="stat-text">Completion Rate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            const today = new Date().toISOString().split('T')[0];
-            const todaySessions = sessions.filter(s => s.date === today);
+    <!-- NOTES SECTION -->
+    <section id="notes" class="notes-section">
+        <div class="container">
+            <h2 class="section-title">Study Notes & Resources</h2>
+            <div class="notes-grid">
+                <div class="note-card">
+                    <div class="note-icon">📘</div>
+                    <h3>Mathematics - Algebra</h3>
+                    <p>Complete guide to algebraic equations and formulas</p>
+                    <button class="btn btn-outline" onclick="downloadNote('Math-Algebra')">Download PDF</button>
+                </div>
+                <div class="note-card">
+                    <div class="note-icon">📗</div>
+                    <h3>Physics - Mechanics</h3>
+                    <p>Laws of motion, energy, and work explained</p>
+                    <button class="btn btn-outline" onclick="downloadNote('Physics-Mechanics')">Download PDF</button>
+                </div>
+                <div class="note-card">
+                    <div class="note-icon">📙</div>
+                    <h3>Chemistry - Organic</h3>
+                    <p>Organic reactions and molecular structures</p>
+                    <button class="btn btn-outline" onclick="downloadNote('Chemistry-Organic')">Download PDF</button>
+                </div>
+                <div class="note-card">
+                    <div class="note-icon">📕</div>
+                    <h3>Biology - Genetics</h3>
+                    <p>DNA, heredity, and genetic engineering</p>
+                    <button class="btn btn-outline" onclick="downloadNote('Biology-Genetics')">Download PDF</button>
+                </div>
+                <div class="note-card">
+                    <div class="note-icon">📔</div>
+                    <h3>English - Literature</h3>
+                    <p>Analysis of classic and modern literature</p>
+                    <button class="btn btn-outline" onclick="downloadNote('English-Literature')">Download PDF</button>
+                </div>
+                <div class="note-card">
+                    <div class="note-icon">📓</div>
+                    <h3>History - Modern Era</h3>
+                    <p>Key events and personalities of the modern era</p>
+                    <button class="btn btn-outline" onclick="downloadNote('History-Modern')">Download PDF</button>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            let todaySeconds = 0;
-            todaySessions.forEach(s => todaySeconds += s.duration);
+    <!-- PREMIUM SECTION -->
+    <section id="premium" class="premium-section">
+        <div class="container">
+            <h2 class="section-title">Premium Resources</h2>
+            <div class="premium-grid">
+                <div class="premium-card">
+                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-icon">📖</div>
+                    <h3>Complete Study Guides</h3>
+                    <p>Comprehensive notes for all major subjects</p>
+                    <div class="premium-price">₹199</div>
+                    <button class="btn btn-primary" onclick="unlockPremium('Study Guides')">Unlock Premium</button>
+                </div>
+                <div class="premium-card">
+                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-icon">🎯</div>
+                    <h3>Exam Strategy</h3>
+                    <p>Advanced techniques to ace your exams</p>
+                    <div class="premium-price">₹199</div>
+                    <button class="btn btn-primary" onclick="unlockPremium('Exam Strategy')">Unlock Premium</button>
+                </div>
+                <div class="premium-card">
+                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-icon">💯</div>
+                    <h3>Question Bank</h3>
+                    <p>1000+ practice questions with solutions</p>
+                    <div class="premium-price">₹299</div>
+                    <button class="btn btn-primary" onclick="unlockPremium('Question Bank')">Unlock Premium</button>
+                </div>
+                <div class="premium-card">
+                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-icon">📝</div>
+                    <h3>Mock Tests</h3>
+                    <p>Full-length mock tests with detailed analysis</p>
+                    <div class="premium-price">₹399</div>
+                    <button class="btn btn-primary" onclick="unlockPremium('Mock Tests')">Unlock Premium</button>
+                </div>
+                <div class="premium-card">
+                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-icon">👨‍🏫</div>
+                    <h3>1-on-1 Mentoring</h3>
+                    <p>Personal guidance from expert mentors</p>
+                    <div class="premium-price">₹999</div>
+                    <button class="btn btn-primary" onclick="unlockPremium('Mentoring')">Unlock Premium</button>
+                </div>
+                <div class="premium-card">
+                    <div class="premium-badge">🔒 Premium</div>
+                    <div class="premium-icon">🎥</div>
+                    <h3>Video Lectures</h3>
+                    <p>Recorded lectures by top educators</p>
+                    <div class="premium-price">₹499</div>
+                    <button class="btn btn-primary" onclick="unlockPremium('Video Lectures')">Unlock Premium</button>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            const hours = Math.floor(todaySeconds / 3600);
-            const mins = Math.floor((todaySeconds % 3600) / 60);
-            document.getElementById('todayHours').textContent = `${hours}h ${mins}m`;
-            document.getElementById('todaySessions').textContent = todaySessions.length;
-            document.getElementById('goalDisplay').textContent = `${userData.goal}h`;
+    <!-- TESTIMONIALS SECTION -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">What Students Say</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p>"StudyHub helped me score 95% in my exams. The timer and planner features are game-changers!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">👩‍🎓</div>
+                        <div>
+                            <div class="author-name">Sarah Johnson</div>
+                            <div class="author-role">Student</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p>"The notes and resources are incredibly well-organized. Saves me so much time searching for materials."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">👨‍🎓</div>
+                        <div>
+                            <div class="author-name">Mike Chen</div>
+                            <div class="author-role">Student</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p>"Best platform for organized studying. I improved my focus and completed all my tasks on time."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">👩‍🏫</div>
+                        <div>
+                            <div class="author-name">Emma Davis</div>
+                            <div class="author-role">Educator</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            const totalSeconds = sessions.reduce((sum, s) => sum + s.duration, 0);
-            document.getElementById('totalHours').textContent = `${(totalSeconds / 3600).toFixed(1)}h`;
+    <!-- NEWSLETTER SECTION -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>Get Weekly Study Resources</h2>
+                <p>Subscribe to get curated study materials and tips directly in your inbox</p>
+                <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+                    <input type="email" id="emailInput" placeholder="Enter your email" required>
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </form>
+                <p class="newsletter-note" id="newsletterMessage"></p>
+            </div>
+        </div>
+    </section>
 
-            // Motivation
-            let motivation = 'Keep pushing! You\'re closer than yesterday.';
-            if (hours >= userData.goal) {
-                motivation = '🎉 GOAL ACHIEVED! Rest and recover. You\'re unstoppable!';
-            } else if (hours >= userData.goal * 0.75) {
-                motivation = `🔥 Almost there! Just ${userData.goal - hours} more hour(s) to go!`;
-            } else if (hours > 0) {
-                motivation = `💪 Great start! Keep the momentum going!`;
-            }
-            document.getElementById('motivationMsg').textContent = motivation;
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>StudyHub</h4>
+                    <p>Your all-in-one platform for studying smarter</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#timer">Timer</a></li>
+                        <li><a href="#planner">Planner</a></li>
+                        <li><a href="#notes">Notes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#premium">Premium</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="#">Twitter</a>
+                        <a href="#">Instagram</a>
+                        <a href="#">LinkedIn</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 StudyHub. All rights reserved.</p>
+                <p>Made with ❤️ for students</p>
+            </div>
+        </div>
+    </footer>
 
-            updateStreak();
-        }
-
-        // STREAK
-        function updateStreak() {
-            let streak = JSON.parse(localStorage.getItem('streak')) || { count: 0, lastDate: null };
-            document.getElementById('streakNum').textContent = streak.count;
-        }
-
-        function checkStreak() {
-            const today = new Date().toISOString().split('T')[0];
-            const todaySessions = sessions.filter(s => s.date === today);
-
-            let todaySeconds = 0;
-            todaySessions.forEach(s => todaySeconds += s.duration);
-            const hours = Math.floor(todaySeconds / 3600);
-
-            let streak = JSON.parse(localStorage.getItem('streak')) || { count: 0, lastDate: null };
-
-            if (hours >= userData.goal && streak.lastDate !== today) {
-                const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0];
-                if (streak.lastDate === yesterday) {
-                    streak.count++;
-                } else {
-                    streak.count = 1;
-                }
-                streak.lastDate = today;
-                localStorage.setItem('streak', JSON.stringify(streak));
-                updateStreak();
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
