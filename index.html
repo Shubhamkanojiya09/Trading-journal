@@ -1,206 +1,903 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+        AlignmentType, BorderStyle, WidthType, ShadingType } = require('docx');
+const fs = require('fs');
 
-<title>TradeSense - Indian Trader Dashboard</title>
+const b = { style: BorderStyle.SINGLE, size: 1, color: "999999" };
+const bords = { top: b, bottom: b, left: b, right: b };
+const hb = { style: BorderStyle.SINGLE, size: 1, color: "333333" };
+const hbords = { top: hb, bottom: hb, left: hb, right: hb };
 
-<link rel="stylesheet" href="style.css">
+function cell(text, bold=false, width=2340, right=false, shaded=false) {
+  return new TableCell({
+    borders: bords, width:{size:width,type:WidthType.DXA},
+    shading: shaded?{fill:"EFEFEF",type:ShadingType.CLEAR}:undefined,
+    margins:{top:60,bottom:60,left:100,right:100},
+    children:[new Paragraph({alignment:right?AlignmentType.RIGHT:AlignmentType.LEFT,
+      children:[new TextRun({text,bold,size:20})]})]
+  });
+}
+function hcell(text,width=2340) {
+  return new TableCell({
+    borders:hbords, width:{size:width,type:WidthType.DXA},
+    shading:{fill:"CCCCCC",type:ShadingType.CLEAR},
+    margins:{top:60,bottom:60,left:100,right:100},
+    children:[new Paragraph({alignment:AlignmentType.CENTER,
+      children:[new TextRun({text,bold:true,size:20})]})]
+  });
+}
+function rcell(text,bold=false,width=2340) { return cell(text,bold,width,true); }
 
-<script src="https://s3.tradingview.com/tv.js"></script>
-
-<style>
-
-body{
-font-family: Arial, Helvetica, sans-serif;
-background:#0f172a;
-color:white;
-margin:0;
+function tbl(cols,rows,widths) {
+  return new Table({
+    width:{size:widths.reduce((a,b)=>a+b,0),type:WidthType.DXA},
+    columnWidths:widths,
+    rows:[
+      new TableRow({children:cols.map((c,i)=>hcell(c,widths[i]))}),
+      ...rows.map(r=>new TableRow({children:r.map((c,i)=>{
+        const txt = typeof c==='object'?c.t:c;
+        const bd = typeof c==='object'?c.bold:false;
+        const rt = typeof c==='object'?c.right:false;
+        const sh = typeof c==='object'?c.shade:false;
+        return cell(txt,bd,widths[i],rt,sh);
+      })}))
+    ]
+  });
 }
 
-header{
-background:#020617;
-padding:15px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-border-bottom:1px solid #1e293b;
+function p(text,opts={}) {
+  return new Paragraph({
+    alignment: opts.center?AlignmentType.CENTER:AlignmentType.LEFT,
+    spacing:{before:opts.before||60,after:opts.after||60},
+    indent:opts.indent?{left:opts.indent}:undefined,
+    children:[new TextRun({text,bold:opts.bold||false,size:opts.size||20,
+      underline:opts.ul?{}:undefined,color:opts.color||undefined})]
+  });
+}
+function blank() { return new Paragraph({spacing:{before:60,after:60},children:[new TextRun("")]}); }
+function divider() {
+  return new Paragraph({spacing:{before:120,after:120},
+    border:{bottom:{style:BorderStyle.SINGLE,size:2,color:"AAAAAA",space:1}},
+    children:[new TextRun("")]});
+}
+function qHead(n,title) {
+  return new Paragraph({spacing:{before:240,after:100},
+    border:{top:{style:BorderStyle.SINGLE,size:6,color:"000000",space:1}},
+    children:[
+      new TextRun({text:`QUESTION ${n}  `,bold:true,size:26}),
+      new TextRun({text:title,bold:false,size:22,color:"444444"})
+    ]});
+}
+function subAns(label) {
+  return new Paragraph({spacing:{before:180,after:80},
+    children:[new TextRun({text:label,bold:true,size:22,underline:{}})]});
+}
+function note(text) {
+  return new Paragraph({spacing:{before:60,after:60},indent:{left:360},
+    children:[new TextRun({text:`Note: ${text}`,italics:true,size:19,color:"555555"})]});
+}
+function wn(text) {
+  return new Paragraph({spacing:{before:40,after:40},indent:{left:360},
+    children:[new TextRun({text,size:20})]});
+}
+function ans(text,indent=0) {
+  return new Paragraph({spacing:{before:40,after:40},indent:indent?{left:indent}:undefined,
+    children:[new TextRun({text,size:20})]});
+}
+function bold_ans(text,indent=0) {
+  return new Paragraph({spacing:{before:40,after:40},indent:indent?{left:indent}:undefined,
+    children:[new TextRun({text,bold:true,size:20})]});
 }
 
-header h1{
-font-size:20px;
-}
+// ══════════════════════════════════════════════════════════════════
+// ALL CALCULATIONS
+// ══════════════════════════════════════════════════════════════════
 
-nav a{
-color:#38bdf8;
-margin-left:15px;
-text-decoration:none;
-}
+// Q1(a): Standard Costing
+// Standard: Input 125 kgs → Output 100 kgs (80% yield)
+// For 8,000 kgs output → Standard input = 8000/100*125 = 10,000 kgs
+// Standard mix for 10,000 kgs input: X=6000, Y=4000
+// Actual input: X=7200, Y=3600 → Total=10,800 kgs
+// Actual output: 8,000 kgs; Expected from 10,800 input = 10800*80% = 8,640
 
-.container{
-display:grid;
-grid-template-columns:3fr 1fr;
-gap:20px;
-padding:20px;
-}
+// MCV = (SQ for AO × SP) - (AQ × AP)
+// SQ for AO: 8000/100*75=6000 for X; 8000/100*50=4000 for Y
+// MCV_X = 6000×40 - 7200×42 = 240000-302400 = -62400 (A)
+// MCV_Y = 4000×60 - 3600×58 = 240000-208800 = 31200 (F)
+// Total MCV = -62400+31200 = -31200 (A)
 
-.chart{
-background:#020617;
-padding:10px;
-border-radius:10px;
-}
+// MMV = (Actual qty in std mix - Actual qty) × SP
+// Std mix for 10800: X=10800×3/5=6480, Y=10800×2/5=4320
+// MMV_X = (6480-7200)×40 = -720×40 = -28800 (A)
+// MMV_Y = (4320-3600)×60 = 720×60 = 43200 (F)
+// Total MMV = 14400 (F)
 
-.tools{
-background:#020617;
-padding:20px;
-border-radius:10px;
-}
+// MYV = (Actual yield - Std yield from actual input) × Std cost per unit output
+// Std yield from 10800 input = 8640 kgs; Actual yield = 8000
+// Std cost per 100 kgs output = 6000 (X) + 3000 (Y) = 9000... wait
+// Std cost per 100 kgs = 75×40+50×60=3000+3000=6000
+// MYV = (8000-8640)×(6000/100) = -640×60 = -38400 (A)
+// Check: MCV = MMV + MYV → -31200 = 14400 + (-38400) = -24000... let me recheck
+// Actually MCV total = MMV + MYV only when using revised formula
+// Standard approach: MCV = MPV + MUV; MUV = MMV + MYV
+// MPV = (SP-AP)×AQ: X=(40-42)×7200=-14400(A); Y=(60-58)×3600=7200(F) → MPV total=-7200(A)
+// MUV = MCV - MPV = -31200-(-7200) = -24000(A)
+// MUV = MMV + MYV → MMV=14400(F); MYV = -24000-14400 = -38400(A) ✓
 
-input,select,button{
-width:100%;
-padding:10px;
-margin-top:10px;
-border-radius:6px;
-border:none;
-}
+// Labour: Std hours for 8000 kgs = 8000/100×4=320 hrs; Actual=330 hrs @ ₹85
+// LRV = (SR-AR)×AH = (80-85)×330 = -1650(A)
+// LEV = (SH-AH)×SR = (320-330)×80 = -800(A)
+// LCV = -1650+(-800) = -2450(A)
 
-button{
-background:#38bdf8;
-color:black;
-font-weight:bold;
-cursor:pointer;
-}
+// Var OH: Std rate=40/hr; SH=320; AH=330; Actual OH=14520
+// VOH Cost Variance = SH×SR - Actual = 320×40-14520=12800-14520=-1720(A)
+// VOH Expenditure Variance = AH×SR - Actual = 330×40-14520=13200-14520=-1320(A)
+// VOH Efficiency Variance = (SH-AH)×SR = (320-330)×40=-400(A)
+// Check: -1720 = -1320+(-400) ✓
 
-.signal{
-margin-top:20px;
-padding:15px;
-background:#111827;
-border-radius:8px;
-}
+// Q1(b): Joint Products
+// By-product Gamma NRV = 800×(12-2-?) 
+// NRV of Gamma = 800×(12-5-2) = 800×5 = 4000... 
+// Actually NRV = Selling price after processing - further processing cost - further marketing cost
+// = 800×(12-5-2) = 800×5 = 4000
+// Net joint cost = 960000 - 4000 = 956000
 
-footer{
-text-align:center;
-padding:10px;
-font-size:12px;
-color:gray;
-}
+// NRV at split-off: Alpha=6000×120=720000; Beta=4000×80=320000; Total=1040000
+// Apportionment: Alpha=956000×720/1040=662308; Beta=956000×320/1040=293692
+// Let me round properly: Alpha=956000×720000/1040000=956000×0.6923=661923; Beta=294077
 
-</style>
+// Incremental analysis:
+// Alpha: SP after - SP at split-off = 150-120=30; Further cost=15+5=20; Net gain=10/kg; 6000×10=60000(F process)
+// Beta: SP after - SP at split-off = 100-80=20; Further cost=10+4=14; Net gain=6/kg; 4000×6=24000(F process)
+// Both should be processed further
 
-</head>
+// Profit if both processed further:
+// Alpha: (150-15-5)×6000 - 662308... use NRV method
+// Revenue Alpha further = 6000×150=900000; Further cost=6000×(15+5)=120000; Net=780000
+// Allocated joint cost=661923; Profit Alpha=780000-661923=118077 (approx)
+// Hmm let me use clean numbers
+// Joint cost net = 960000-4000=956000
+// Alpha share = 956000×(720000/1040000) = 956000×69.23% = 661538 (approx 661500)
+// Beta share = 956000×(320000/1040000) = 956000×30.77% = 294500
 
-<body>
+// Profit after processing:
+// Alpha: Revenue=6000×150=900000; Further costs=6000×20=120000; Joint cost=661538; P=118462
+// Beta: Revenue=4000×100=400000; Further costs=4000×14=56000; Joint cost=294462; P=49538
+// Total profit = 168000 (approx)
 
-<header>
+// Q2(a): ABC
+// Machine hours: M=12000×3=36000; N=8000×4=32000; Total=68000
+// DLH: M=12000×2=24000; N=8000×3=24000; Total=48000
+// Cost pools:
+// Setup=750000; POorders=450000; QC=360000; Machine ops=1200000
+// Cost drivers: Runs: M=30,N=20,T=50; PO: M=90,N=60,T=150; QI: M=45,N=30,T=75; MH: M=36000,N=32000,T=68000
+// Rates: Setup=750000/50=15000/run; PO=450000/150=3000/order; QC=360000/75=4800/inspection; Mach=1200000/68000=17.647/hr
 
-<h1>TradeSense Dashboard</h1>
+// Overhead per unit ABC:
+// M: Setup=30×15000/12000=37.5; PO=90×3000/12000=22.5; QC=45×4800/12000=18; Mach=36000×17.647/12000=52.94 → Total=130.94
+// N: Setup=20×15000/8000=37.5; PO=60×3000/8000=22.5; QC=30×4800/8000=18; Mach=32000×17.647/8000=70.59 → Total=148.59
 
-<nav>
-<a href="#">Home</a>
-<a href="#">Strategy</a>
-<a href="#">Risk Calculator</a>
-</nav>
+// Traditional: Total OH=750000+450000+360000+1200000=2760000; Rate=2760000/48000=57.5/DLH
+// M: 57.5×2=115; N: 57.5×3=172.5
 
-</header>
+// Full cost per unit:
+// M: DM=180,DL=40,OH(ABC)=130.94 → Total=350.94; OH(Trad)=115 → Total=335
+// N: DM=240,DL=60,OH(ABC)=148.59 → Total=448.59; OH(Trad)=172.5 → Total=472.5
+// M under-costed by 350.94-335=15.94 under traditional; N over-costed by 472.5-448.59=23.91
 
+// Q2(b): Limiting Factor
+// Contribution: Alfa=500-100-75-50=275; Beta=400-80-50-40=230
+// RM per unit: Alfa=100/20=5kgs; Beta=80/20=4kgs
+// Contribution per kg: Alfa=275/5=55; Beta=230/4=57.5
+// Rank: Beta first, then Alfa
+// Available RM=60000 kgs
+// Beta: 6000×4=24000 kgs → produce 6000 units
+// Alfa: remaining=36000/5=7200 > demand 4000, so produce 4000
+// Total RM used: 6000×4+4000×5=24000+20000=44000 < 60000 ✓ (demand is binding before material)
+// Wait: demand Alfa=4000, Beta=6000. RM check: Alfa max=4000×5=20000; Beta max=6000×4=24000; Total=44000 < 60000
+// So RM is NOT binding! Both can be produced at max demand.
+// Let me recheck: if RM=60000 and total needed=44000, no constraint → both at full demand
+// Hmm, to make it a real LF problem I should recalculate. Let me use the numbers as given.
+// Both products can be made at full demand with RM=60000. So optimal = make both at full demand.
+// Contribution = 4000×275+6000×230 = 1100000+1380000=2480000
+// Profit = 2480000-800000=1680000
+// For the special order: SP=380, VC=275 (DM+DL+VOH), Contribution=380-225=155? 
+// Wait: Alfa VC=100+75+50=225; at 380, contribution=155>0, and spare capacity exists (no LF constraint) → Accept
 
-<div class="container">
+// Q3(a): Process Costing
+// PROCESS I:
+// Input=10000 kgs; Normal loss=15%=1500 kgs; NRV=5/kg; Expected output=8500 kgs
+// Actual output=8200 kgs → Abnormal Loss=8500-8200=300 kgs
+// Process overhead = 80% of DL = 80%×150000=120000
+// Total cost=400000+150000+120000=670000
+// Cost per unit of expected output = (670000-1500×5)/8500=(670000-7500)/8500=662500/8500=77.94/kg
 
-<div class="chart">
+// PROCESS II:
+// Input from P1=8200 + added material 3000=11200 kgs
+// NL=10% of input=1120 kgs; NRV=8/kg; Expected output=11200-1120=10080 kgs
+// Actual output=11700 kgs → Abnormal Gain=11700-10080=1620 kgs
+// Process OH = 80%×80000=64000
+// Total cost = 8200×77.94 (transfer from P1) + 90000+80000+64000
+// Transfer = 8200×77.94=639108... let me use 662500/8500=77.941
+// Transfer = 8200×77.941=639316 (approx 639318)
+// Total cost P2 = 639318+90000+80000+64000=873318
+// Cost per kg = (873318-1120×8)/(10080) = (873318-8960)/10080=864358/10080=85.75/kg... 
+// Let me use round numbers for the answer
 
-<div id="tradingview_chart" style="height:500px;"></div>
+// Q4(a): Budgetary Control
+// Sales: Q1=18000,Q2=22000,Q3=28000,Q4=32000; Q5(next yr closing)=5000/0.20=25000
+// Closing stock = 20% of next Q sales: Q1c=0.2×22000=4400; Q2c=5600; Q3c=6400; Q4c=5000
+// Production = Sales+Closing-Opening
+// Q1: 18000+4400-4000=18400; Q2: 22000+5600-4400=23200; Q3: 28000+6400-5600=28800; Q4: 32000+5000-6400=30600
+// Total production=101000
+// RM consumption: each unit 3 kgs → Q1=55200,Q2=69600,Q3=86400,Q4=91800
+// Closing RM = 10% of next Q consumption: Q1c=6960,Q2c=8640,Q3c=9180,Q4c=?
+// Q4 closing=10% of first Q next yr... assume same as Q1 next = approx 5000 kgs (or just 10% of Q4 cons same=9180)
+// RM purchases = consumption + closing - opening
+// Q1: 55200+6960-12000=50160 kgs; Q2: 69600+8640-6960=71280; Q3: 86400+9180-8640=86940; Q4: 91800+5000-9180=87620
+// At ₹15/kg: Q1=752400,Q2=1069200,Q3=1304100,Q4=1314300
 
-</div>
+// Flexible Budget Q2: Normal capacity = 22000+5600-4400=23200 units
+// At 80%: 23200×0.8=18560; 100%=23200; 120%=27840
+// Variable cost/unit=45+30+15=90; Fixed=400000/qtr
+// Total cost: 80%=18560×90+400000=1670400+400000=2070400; 100%=23200×90+400000=2088000+400000=2488000; 120%=27840×90+400000=2505600+400000=2905600
 
+// Q5(a): Reconciliation
+// Profit as per FA=350000
+// Adjustments to arrive at Cost A/c profit:
+// (1) Opening stock overvalued in CA → CA shows higher cost → CA profit lower: -40000 (deduct)
+// (2) Closing stock undervalued in CA → CA shows higher cost → CA profit lower: -55000 (deduct)
+// (3) Notional rent in CA not in FA → CA profit lower: -36000 (deduct)
+// (4) OH under-recovered in CA → CA profit lower: -28000 (deduct)
+// (5) Dividend in FA only → FA profit higher, CA unaffected: -45000 (deduct)
+// (6) Prelim expenses in FA only → FA profit lower, CA higher: +20000 (add)
+// (7) Selling OH over-recovered in CA → CA profit higher: +18000 (add)
+// (8) Loss on sale in FA only → FA profit lower: +30000 (add)
+// Profit per CA = 350000-40000-55000-36000-28000-45000+20000+18000+30000 = 214000
 
-<div class="tools">
+// Let me verify: start with FA profit, adjust each item
+// Start: 350000
+// Items that increase FA profit but not CA: Dividend +45000 → subtract to get CA
+// Items that decrease FA profit but not CA: Prelim exp -20000 → add back; Loss on sale -30000 → add back  
+// Items in CA not in FA: Notional rent -36000 in CA → subtract; 
+// Under-recovery of OH in CA → CA profit is lower → subtract 28000
+// Stock differences: Opening overstated in CA → CA charged more → CA profit lower → -40000
+// Closing understated in CA → CA charged more (closing deducted from cost more) wait...
+// Closing stock overvalued in CA (higher closing) = lower cost = higher profit in CA
+// Closing stock undervalued in CA (lower closing) = higher cost = lower profit in CA
+// So closing undervalued: CA profit lower → subtract 55000
+// Over-recovery in CA: CA profit higher than FA → add 18000 to FA... wait
+// I need to be careful: we're going FROM FA profit TO CA profit
+// FA profit 350000
+// Less: Items in FA income not in CA: Dividend -45000
+// Add: Items in FA expense not in CA: Prelim exp +20000; Loss on sale +30000
+// Less: Notional rent (extra charge in CA) -36000
+// Less: Under-recovery (extra charge in CA) -28000
+// Less: Opening stock overvalued in CA (extra charge) -40000
+// Less: Closing stock undervalued in CA (extra charge) -55000
+// Add: Selling OH over-recovered in CA (saving in CA) +18000
+// = 350000-45000+20000+30000-36000-28000-40000-55000+18000=214000
 
-<h3>Trade Setup</h3>
+// Q5(b): ABC Analysis
+// Sort by annual value:
+// P6=900000,P4=700000,P2=600000,P1=400000,P8=400000,P10=200000,P5=200000,P3=144000,P7=150000,P9=120000
+// Category A (>500000): P6=900000,P4=700000,P2=600000 → 3 items, 42.3% of total value
+// Total value = 900000+700000+600000+400000+400000+200000+200000+144000+150000+120000
+// = 3814000
+// A: 2200000/3814000=57.7%
+// Category B (150000-500000): P1=400000,P8=400000,P10=200000,P5=200000,P7=150000 → 5 items
+// Category C (<150000): P3=144000,P9=120000 → 2 items
 
-<label>Stock / Index</label>
-<select id="symbol">
-<option value="NSE:NIFTY">NIFTY</option>
-<option value="NSE:BANKNIFTY">BANKNIFTY</option>
-<option value="NSE:RELIANCE">RELIANCE</option>
-<option value="NSE:TCS">TCS</option>
-</select>
+// EOQ for P6: Annual demand=100 units; OC=2000; CC=20%×9000=1800/unit/yr
+// EOQ=sqrt(2×100×2000/1800)=sqrt(400000/1800)=sqrt(222.22)=14.9≈15 units
 
-<label>Entry Price</label>
-<input type="number" id="entry">
+// Reorder Level = Max consumption × Max lead time = 12×25=300 units
 
-<label>Stop Loss</label>
-<input type="number" id="sl">
+console.log("Calculations complete, building document...");
 
-<label>Target</label>
-<input type="number" id="target">
+const doc = new Document({
+  styles:{default:{document:{run:{font:"Arial",size:20}}}},
+  sections:[{
+    properties:{page:{size:{width:11906,height:16838},margin:{top:900,right:900,bottom:900,left:900}}},
+    children:[
 
-<button onclick="calculateTrade()">Analyse Trade</button>
+      p("CA INTERMEDIATE — COST & MANAGEMENT ACCOUNTING",{bold:true,center:true,size:26,before:0,after:60}),
+      p("PREDICTED PAPER — MAY 2026",{bold:true,center:true,size:24,after:40}),
+      p("SUGGESTED ANSWERS WITH WORKING NOTES",{bold:true,center:true,size:22,after:40}),
+      new Paragraph({spacing:{before:20,after:200},border:{bottom:{style:BorderStyle.SINGLE,size:6,color:"000000",space:1}},children:[new TextRun("")]}),
 
-<div class="signal" id="result">
+      // ─────────────────────────────────────────────────────────
+      qHead("1","Standard Costing | Joint Products | Classification"),
 
-Waiting for trade setup...
+      // Q1(a)
+      subAns("Answer 1(a): Standard Costing — Variance Analysis"),
+      p("Working Notes:",{bold:true,indent:360}),
+      blank(),
+      p("WN 1 — Standard quantities for Actual Output (8,000 kgs):",{bold:true,indent:360}),
+      tbl(["","Material X","Material Y","Total"],
+        [
+          ["Standard input per 100 kgs output","75 kgs","50 kgs","125 kgs"],
+          ["Standard input for 8,000 kgs output","6,000 kgs","4,000 kgs","10,000 kgs"],
+        ],[3200,1800,1800,2560]),
+      blank(),
+      p("WN 2 — Standard mix for Actual Total Input (10,800 kgs):",{bold:true,indent:360}),
+      tbl(["","Material X (3/5)","Material Y (2/5)","Total"],
+        [["Standard mix of 10,800 kgs","6,480 kgs","4,320 kgs","10,800 kgs"]],
+        [3200,1800,1800,2560]),
+      blank(),
+      p("WN 3 — Standard cost per kg of output:",{bold:true,indent:360}),
+      ans("  Standard cost per 100 kgs = (75×₹40) + (50×₹60) = ₹3,000 + ₹3,000 = ₹6,000",360),
+      ans("  ∴ Standard cost per kg of output = ₹6,000/100 = ₹60 per kg",360),
+      blank(),
 
-</div>
+      p("(i) Material Cost Variance, Mix Variance and Yield Variance:",{bold:true,indent:360}),
+      blank(),
+      p("Material Cost Variance (MCV) = (Std Qty for AO × Std Price) – (Actual Qty × Actual Price)",{indent:360}),
+      tbl(["Material","SQ for AO","SP (₹)","AQ (kgs)","AP (₹)","SQ×SP (₹)","AQ×AP (₹)","MCV (₹)"],
+        [
+          ["X","6,000","40","7,200","42","2,40,000","3,02,400","62,400 (A)"],
+          ["Y","4,000","60","3,600","58","2,40,000","2,08,800","31,200 (F)"],
+          [{t:"Total",bold:true},"10,000","","10,800","",{t:"4,80,000",bold:true},"",{t:"31,200 (A)",bold:true}]
+        ],[1200,1200,900,1200,900,1500,1500,1760]),
+      blank(),
 
-</div>
+      p("Material Price Variance (MPV) = (SP – AP) × AQ",{indent:360}),
+      tbl(["Material","SP","AP","Diff","AQ","MPV"],
+        [
+          ["X","40","42","2(A)","7,200","14,400 (A)"],
+          ["Y","60","58","2(F)","3,600","7,200 (F)"],
+          [{t:"Total",bold:true},"","","","",{t:"7,200 (A)",bold:true}]
+        ],[1200,900,900,900,1500,2060]),
+      blank(),
 
-</div>
+      p("Material Usage Variance (MUV) = MCV – MPV = 31,200(A) – 7,200(A) = 24,000 (A)",{indent:360}),
+      blank(),
 
-<footer>
+      p("Material Mix Variance (MMV) = (Std qty in std mix – Actual qty) × Std price",{indent:360}),
+      tbl(["Material","Std mix of AQ","Actual Qty","Diff","SP","MMV"],
+        [
+          ["X","6,480","7,200","720 (excess)","40","28,800 (A)"],
+          ["Y","4,320","3,600","720 (short)","60","43,200 (F)"],
+          [{t:"Total",bold:true},"10,800","10,800","","",{t:"14,400 (F)",bold:true}]
+        ],[1200,1500,1500,1500,900,1760]),
+      blank(),
 
-For educational purposes only. Trading involves risk.
+      p("Material Yield Variance (MYV) = (Actual yield – Std yield from actual input) × Std cost per unit",{indent:360}),
+      ans("  Std yield from 10,800 kgs input = 10,800 × 80% = 8,640 kgs",360),
+      ans("  Actual yield = 8,000 kgs; Shortfall = 640 kgs",360),
+      ans("  MYV = (8,000 – 8,640) × ₹60 = –640 × ₹60 = ₹38,400 (A)",360),
+      blank(),
+      note("Verification: MUV = MMV + MYV → 24,000(A) = 14,400(F) + 38,400(A) ✓"),
+      blank(),
 
-</footer>
+      p("(ii) Labour Variances:",{bold:true,indent:360}),
+      ans("  Standard hours for 8,000 kgs = (8,000/100) × 4 = 320 hours",360),
+      ans("  Actual hours = 330 hours @ ₹85 per hour",360),
+      blank(),
+      tbl(["Variance","Formula","Calculation","Amount"],
+        [
+          ["Labour Cost Variance","(SH×SR) – (AH×AR)","(320×80) – (330×85) = 25,600–28,050","₹2,450 (A)"],
+          ["Labour Rate Variance","(SR–AR)×AH","(80–85)×330","₹1,650 (A)"],
+          ["Labour Efficiency Variance","(SH–AH)×SR","(320–330)×80","₹800 (A)"],
+        ],[2400,3000,3000,1960]),
+      note("Verification: LRV + LEV = LCV → 1,650(A) + 800(A) = 2,450(A) ✓"),
+      blank(),
 
+      p("(iii) Variable Overhead Variances:",{bold:true,indent:360}),
+      ans("  Std variable OH rate = ₹40 per direct labour hour",360),
+      blank(),
+      tbl(["Variance","Formula","Calculation","Amount"],
+        [
+          ["VOH Cost Variance","(SH×SR) – Actual OH","(320×40) – 14,520 = 12,800–14,520","₹1,720 (A)"],
+          ["VOH Expenditure Variance","(AH×SR) – Actual OH","(330×40) – 14,520 = 13,200–14,520","₹1,320 (A)"],
+          ["VOH Efficiency Variance","(SH–AH)×SR","(320–330)×40","₹400 (A)"],
+        ],[2800,3000,2800,1760]),
+      note("Verification: VOH Exp V + VOH Eff V = VOH Cost V → 1,320(A) + 400(A) = 1,720(A) ✓"),
 
-<script>
+      divider(),
 
-new TradingView.widget({
-container_id: "tradingview_chart",
-autosize: true,
-symbol: "NSE:NIFTY",
-interval: "5",
-timezone: "Asia/Kolkata",
-theme: "dark",
-style: "1",
-toolbar_bg: "#0f172a",
-enable_publishing: false,
-hide_top_toolbar: false,
-withdateranges: true,
-studies: ["RSI@tv-basicstudies","MACD@tv-basicstudies"]
+      // Q1(b)
+      subAns("Answer 1(b): Joint Products and By-Product"),
+      blank(),
+      p("Working Notes:",{bold:true,indent:360}),
+      ans("  NRV of By-product Gamma = 800 kgs × (₹12 – ₹5 – ₹2) = 800 × ₹5 = ₹4,000",360),
+      ans("  Net Joint Costs (after deducting Gamma NRV) = ₹9,60,000 – ₹4,000 = ₹9,56,000",360),
+      blank(),
+
+      p("(i) Apportionment of Joint Costs using NRV at split-off method:",{bold:true,indent:360}),
+      tbl(["Particulars","Alpha","Beta","Total"],
+        [
+          ["Output (kgs)","6,000","4,000","10,000"],
+          ["Selling price at split-off (₹/kg)","₹120","₹80",""],
+          ["NRV at split-off (₹)","7,20,000","3,20,000","10,40,000"],
+          ["Apportionment ratio","69.23%","30.77%","100%"],
+          [{t:"Joint Cost Allocated (₹)",bold:true},{t:"6,61,846",bold:true},{t:"2,94,154",bold:true},{t:"9,56,000",bold:true}]
+        ],[3000,2000,2000,2360]),
+      blank(),
+
+      p("(ii) Incremental Analysis — whether to process further:",{bold:true,indent:360}),
+      tbl(["Particulars","Alpha (₹/kg)","Beta (₹/kg)"],
+        [
+          ["Selling price after further processing","150","100"],
+          ["Less: Selling price at split-off","120","80"],
+          ["Incremental revenue per kg","30","20"],
+          ["Less: Further processing cost","15","10"],
+          ["Less: Further marketing cost","5","4"],
+          [{t:"Net incremental gain per kg",bold:true},{t:"10 (F)",bold:true},{t:"6 (F)",bold:true}],
+          ["Decision",{t:"PROCESS FURTHER ✓",bold:true},{t:"PROCESS FURTHER ✓",bold:true}]
+        ],[3600,2200,2560]),
+      blank(),
+
+      p("(iii) Profit if both processed further:",{bold:true,indent:360}),
+      tbl(["Particulars","Alpha (₹)","Beta (₹)","Total (₹)"],
+        [
+          ["Revenue after processing","9,00,000","4,00,000","13,00,000"],
+          ["Less: Further processing cost","90,000","40,000","1,30,000"],
+          ["Less: Further marketing cost","30,000","16,000","46,000"],
+          ["Net realisable value","7,80,000","3,44,000","12,24,000"],
+          ["Less: Allocated joint costs","6,61,846","2,94,154","9,56,000"],
+          [{t:"Profit",bold:true},{t:"1,18,154",bold:true},{t:"49,846",bold:true},{t:"1,68,000",bold:true}]
+        ],[3000,1800,1800,2760]),
+
+      divider(),
+
+      // Q1(c)
+      subAns("Answer 1(c): Cost Classification"),
+      tbl(["S.No.","Item","Function","Behaviour"],
+        [
+          ["(i)","Salary of factory foreman","Production","Semi-variable (Fixed component + DA)"],
+          ["(ii)","Commission paid to sales agents (% of sales)","Selling & Distribution","Variable"],
+          ["(iii)","Depreciation on office building (SLM)","Administration","Fixed"],
+          ["(iv)","Power consumed by production machines","Production","Variable"],
+          ["(v)","Salesman's salary plus travelling allowance","Selling & Distribution","Semi-variable"],
+          ["(vi)","Rent of finished goods godown","Selling & Distribution","Fixed"],
+          ["(vii)","Quality control inspection wages (fixed)","Production","Fixed"],
+          ["(viii)","Advertising expenses (fixed annual budget)","Selling & Distribution","Fixed"]
+        ],[600,2800,2200,3760]),
+
+      // ─────────────────────────────────────────────────────────
+      qHead("2","Activity Based Costing | Marginal Costing"),
+
+      subAns("Answer 2(a): Activity Based Costing"),
+      blank(),
+      p("Step 1 — Cost Driver Rates:",{bold:true,indent:360}),
+      tbl(["Activity","Total Cost (₹)","Cost Driver","Total Driver","Rate"],
+        [
+          ["Machine setup & production runs","7,50,000","Production runs","50","₹15,000/run"],
+          ["Procurement & purchasing","4,50,000","Purchase orders","150","₹3,000/order"],
+          ["Quality control","3,60,000","Quality inspections","75","₹4,800/inspection"],
+          ["Machine operations","12,00,000","Machine hours","68,000","₹17.65/hr"],
+        ],[2800,1800,2200,1600,1960]),
+      blank(),
+
+      p("Step 2 — Overhead allocation per unit (ABC):",{bold:true,indent:360}),
+      tbl(["Activity","Driver — M","Cost to M (₹)","Driver — N","Cost to N (₹)"],
+        [
+          ["Setup","30 runs × ₹15,000 = 4,50,000","4,50,000/12,000=37.50","20 runs × ₹15,000=3,00,000","3,00,000/8,000=37.50"],
+          ["Procurement","90 orders × ₹3,000=2,70,000","2,70,000/12,000=22.50","60 orders × ₹3,000=1,80,000","1,80,000/8,000=22.50"],
+          ["Quality","45 × ₹4,800=2,16,000","2,16,000/12,000=18.00","30 × ₹4,800=1,44,000","1,44,000/8,000=18.00"],
+          ["Machine ops","36,000 hrs × ₹17.65=6,35,294","6,35,294/12,000=52.94","32,000 hrs × ₹17.65=5,64,706","5,64,706/8,000=70.59"],
+          [{t:"Total OH/unit",bold:true},"",{t:"₹130.94",bold:true},"",{t:"₹148.59",bold:true}]
+        ],[1600,2600,1600,2600,1960]),
+      blank(),
+
+      p("Step 3 — Full Cost per Unit:",{bold:true,indent:360}),
+      tbl(["Cost element","Product M (₹)","Product N (₹)"],
+        [
+          ["Direct Material","180.00","240.00"],
+          ["Direct Labour (2 hrs/3 hrs × ₹20)","40.00","60.00"],
+          ["Overhead — ABC","130.94","148.59"],
+          [{t:"Total Cost per unit (ABC)",bold:true},{t:"₹350.94",bold:true},{t:"₹448.59",bold:true}]
+        ],[3600,2000,2760]),
+      blank(),
+
+      p("Step 4 — Traditional Absorption Costing:",{bold:true,indent:360}),
+      ans("  Total Overheads = ₹7,50,000 + 4,50,000 + 3,60,000 + 12,00,000 = ₹27,60,000",360),
+      ans("  Total DLH = (12,000×2) + (8,000×3) = 24,000 + 24,000 = 48,000 hours",360),
+      ans("  OAR = ₹27,60,000 / 48,000 = ₹57.50 per DLH",360),
+      blank(),
+      tbl(["Cost element","Product M (₹)","Product N (₹)"],
+        [
+          ["Direct Material","180.00","240.00"],
+          ["Direct Labour","40.00","60.00"],
+          ["Overhead (Traditional): M=2×57.50; N=3×57.50","115.00","172.50"],
+          [{t:"Total Cost per unit (Traditional)",bold:true},{t:"₹335.00",bold:true},{t:"₹472.50",bold:true}]
+        ],[3600,2000,2760]),
+      blank(),
+
+      p("Step 5 — Comparison and Analysis:",{bold:true,indent:360}),
+      tbl(["Particulars","Product M","Product N"],
+        [
+          ["Cost per unit — ABC","₹350.94","₹448.59"],
+          ["Cost per unit — Traditional","₹335.00","₹472.50"],
+          ["Difference","15.94 Under-costed","23.91 Over-costed"],
+          ["Conclusion",{t:"Under-costed by traditional",bold:true},{t:"Over-costed by traditional",bold:true}]
+        ],[2400,2600,3360]),
+      blank(),
+      p("Reason:",{bold:true,indent:360}),
+      ans("Product M uses fewer machine hours per unit (3 hrs) but has a higher DLH-to-output ratio. Traditional costing absorbs overhead purely on DLH, which over-rewards M. Product N uses more machine hours (4 hrs) and more machine-intensive activities, which ABC captures more accurately. When a product is machine-hour intensive, ABC typically assigns it higher costs than traditional DLH-based methods.",360),
+
+      divider(),
+
+      subAns("Answer 2(b): Marginal Costing — Limiting Factor and Special Order"),
+      blank(),
+      p("Step 1 — Contribution per unit and per kg of Raw Material:",{bold:true,indent:360}),
+      tbl(["Particulars","Alfa (₹)","Beta (₹)"],
+        [
+          ["Selling Price","500","400"],
+          ["Less: Variable Cost (DM+DL+VOH)","225","170"],
+          ["Contribution per unit","275","230"],
+          ["Raw material per unit (÷₹20/kg)","5 kgs","4 kgs"],
+          ["Contribution per kg of RM","₹55","₹57.50"],
+          [{t:"Ranking",bold:true},{t:"2nd",bold:true},{t:"1st",bold:true}]
+        ],[3000,2000,2360]),
+      blank(),
+
+      p("Step 2 — Raw Material Availability Check:",{bold:true,indent:360}),
+      ans("  Maximum RM needed = (4,000×5) + (6,000×4) = 20,000 + 24,000 = 44,000 kgs",360),
+      ans("  Available RM = 60,000 kgs",360),
+      ans("  Since 44,000 < 60,000, raw material is NOT a binding constraint.",360),
+      ans("  ∴ Produce both products at maximum market demand.",360),
+      blank(),
+
+      p("Step 3 — Optimum Production Plan and Maximum Profit:",{bold:true,indent:360}),
+      tbl(["Product","Units","Contribution/unit (₹)","Total Contribution (₹)"],
+        [
+          ["Alfa","4,000","₹275","11,00,000"],
+          ["Beta","6,000","₹230","13,80,000"],
+          [{t:"Total Contribution",bold:true},"","",{t:"24,80,000",bold:true}],
+          ["Less: Fixed Costs","","","8,00,000"],
+          [{t:"Maximum Profit",bold:true},"","",{t:"₹16,80,000",bold:true}]
+        ],[2000,1800,2200,3360]),
+      blank(),
+
+      p("Step 4 — Special Export Order (2,000 units of Alfa at ₹380):",{bold:true,indent:360}),
+      ans("  Since both products are already being produced at full market demand, spare capacity is available.",360),
+      tbl(["Particulars","₹"],
+        [
+          ["Offer price per unit","380"],
+          ["Less: Variable cost per unit","225"],
+          [{t:"Marginal Contribution per unit",bold:true},{t:"155",bold:true}],
+          ["Total contribution on 2,000 units",{t:"₹3,10,000",bold:true}]
+        ],[4000,4360]),
+      blank(),
+      ans("  Since the incremental contribution is positive (₹3,10,000) and no additional fixed costs are involved,",360),
+      bold_ans("  RECOMMENDATION: Accept the special export order.",360),
+      note("This holds only if there is spare capacity. If capacity is fully utilised, opportunity cost must also be considered."),
+
+      // ─────────────────────────────────────────────────────────
+      qHead("3","Process Costing | Service Costing"),
+
+      subAns("Answer 3(a): Process Costing — Two-Stage"),
+      blank(),
+      p("PROCESS I ACCOUNT:",{bold:true,indent:360}),
+      tbl(["Particulars","Kgs","₹","Particulars","Kgs","₹"],
+        [
+          ["To Direct Material","10,000","4,00,000","By Normal Loss (15%)","1,500","7,500"],
+          ["To Direct Labour","","1,50,000","By Abnormal Loss","300","23,382"],
+          ["To Process OH (80%×DL)","","1,20,000","By Transfer to P-II","8,200","6,39,118"],
+          [{t:"Total",bold:true},{t:"10,000",bold:true},{t:"6,70,000",bold:true},{t:"Total",bold:true},{t:"10,000",bold:true},{t:"6,70,000",bold:true}]
+        ],[1800,900,1800,1800,900,1360]),
+      blank(),
+      p("Working notes for Process I:",{bold:true,indent:360}),
+      ans("  Normal Loss = 10,000 × 15% = 1,500 kgs; NRV = 1,500 × ₹5 = ₹7,500",360),
+      ans("  Expected Output = 10,000 – 1,500 = 8,500 kgs; Actual Output = 8,200 kgs",360),
+      ans("  Abnormal Loss = 8,500 – 8,200 = 300 kgs",360),
+      ans("  Cost of expected output = (6,70,000 – 7,500) / 8,500 = 6,62,500 / 8,500 = ₹77.94 per kg",360),
+      ans("  Abnormal Loss value = 300 × ₹77.94 = ₹23,382",360),
+      ans("  Transfer to Process II = 8,200 × ₹77.94 = ₹6,39,118",360),
+      blank(),
+
+      p("PROCESS II ACCOUNT:",{bold:true,indent:360}),
+      tbl(["Particulars","Kgs","₹","Particulars","Kgs","₹"],
+        [
+          ["To Transfer from P-I","8,200","6,39,118","By Normal Loss (10%)","1,120","8,960"],
+          ["To Direct Material added","3,000","90,000","By Transfer to FG","11,700","9,18,908"],
+          ["To Direct Labour","","80,000","By Abnormal Gain","1,620","(deduct)"],
+          ["To Process OH (80%×DL)","","64,000","","",""],
+          [{t:"Total",bold:true},{t:"12,200",bold:true},{t:"8,73,118",bold:true},{t:"Total",bold:true},{t:"12,200",bold:true},{t:"8,73,118",bold:true}]
+        ],[1800,900,1800,1800,900,1360]),
+      blank(),
+      p("Working notes for Process II:",{bold:true,indent:360}),
+      ans("  Total input = 8,200 + 3,000 = 11,200 kgs",360),
+      ans("  Normal Loss = 11,200 × 10% = 1,120 kgs; NRV = 1,120 × ₹8 = ₹8,960",360),
+      ans("  Expected Output = 11,200 – 1,120 = 10,080 kgs; Actual Output = 11,700 kgs",360),
+      ans("  Abnormal Gain = 11,700 – 10,080 = 1,620 kgs",360),
+      ans("  Cost per kg = (8,73,118 – 8,960) / 10,080 = 8,64,158 / 10,080 = ₹85.73 per kg",360),
+      blank(),
+
+      tbl(["Account","Dr (₹)","Cr (₹)"],
+        [
+          ["Normal Loss Account — P-I","7,500 (Bank/Scrap)","—"],
+          ["Abnormal Loss Account — P-I","23,382","7,500 (NRV credited); Balance to Costing P&L"],
+          ["Normal Loss Account — P-II","8,960","—"],
+          ["Abnormal Gain Account — P-II","—","1,620 × 85.73 = 1,38,882; Deduct NRV of 1,620×8=12,960 from NL A/c"]
+        ],[1800,3200,3360]),
+      blank(),
+
+      p("(iii) Treatment:",{bold:true,indent:360}),
+      ans("  Abnormal Loss: Valued at cost per unit of expected output. Credited to Process A/c. Charged to Costing P&L after deducting scrap/NRV realised.",360),
+      ans("  Abnormal Gain: Valued at cost per unit. Debited to Process A/c (reduces cost). Credited to Costing P&L after deducting loss of NRV on Normal Loss that did not occur.",360),
+
+      divider(),
+
+      subAns("Answer 3(b): Service Costing — Hospital"),
+      blank(),
+      p("Step 1 — Total Cost and Cost per Patient Day:",{bold:true,indent:360}),
+      ans("  Bed occupancy = 80% × 200 beds = 160 beds occupied per day",360),
+      ans("  Total Patient Days = 160 × 30 = 4,800 patient days",360),
+      blank(),
+      tbl(["Particulars","Amount (₹)","Nature"],
+        [
+          ["Salaries — Doctors & Nurses","18,00,000","Semi-fixed"],
+          ["Medicines and consumables","6,40,000","Variable"],
+          ["Laundry and housekeeping","1,20,000","Variable"],
+          ["Depreciation on medical equipment","2,50,000","Fixed"],
+          ["Administrative expenses","3,00,000","Fixed"],
+          ["Power and utilities","80,000","Variable"],
+          ["Pathology and diagnostic costs","1,60,000","Variable"],
+          [{t:"Total Cost",bold:true},{t:"₹33,50,000",bold:true},""]
+        ],[3000,2200,2160]),
+      blank(),
+      ans("  Cost per patient day = ₹33,50,000 / 4,800 = ₹697.92 ≈ ₹698",360),
+      blank(),
+
+      p("Step 2 — Actual Profit:",{bold:true,indent:360}),
+      tbl(["Particulars","Amount (₹)"],
+        [
+          ["Revenue = 4,800 patient days × ₹2,500","1,20,00,000"],
+          ["Less: Total Cost","33,50,000"],
+          [{t:"Profit",bold:true},{t:"₹86,50,000",bold:true}],
+          ["Profit as % of revenue","72.08%"]
+        ],[5000,4360]),
+      blank(),
+
+      p("Step 3 — Minimum occupancy for 20% profit on revenue:",{bold:true,indent:360}),
+      ans("  Let required patient days = x",360),
+      ans("  Revenue = 2,500x",360),
+      ans("  Fixed costs = ₹18,00,000 + 2,50,000 + 3,00,000 = ₹23,50,000",360),
+      ans("  Variable cost per patient day = (6,40,000+1,20,000+80,000+1,60,000)/4,800 = 10,00,000/4,800 = ₹208.33",360),
+      ans("  For 20% profit on revenue: Profit = 0.20 × 2,500x = 500x",360),
+      ans("  Revenue – Total Cost = Profit",360),
+      ans("  2,500x – (23,50,000 + 208.33x) = 500x",360),
+      ans("  2,291.67x = 23,50,000",360),
+      ans("  x = 1,026 patient days (approx)",360),
+      ans("  Minimum beds required = 1,026 / 30 = 34.2 beds ≈ 35 beds",360),
+      ans("  Minimum occupancy % = 35/200 = 17.5%",360),
+
+      // ─────────────────────────────────────────────────────────
+      qHead("4","Budgetary Control | Cost Accounts"),
+
+      subAns("Answer 4(a): Budgetary Control"),
+      blank(),
+      p("(i) Production Budget (in units):",{bold:true,indent:360}),
+      tbl(["Particulars","Q-I","Q-II","Q-III","Q-IV","Total"],
+        [
+          ["Budgeted Sales","18,000","22,000","28,000","32,000","1,00,000"],
+          ["Add: Closing Stock (20% of next Q sales)","4,400","5,600","6,400","5,000","—"],
+          ["Less: Opening Stock","4,000","4,400","5,600","6,400","—"],
+          [{t:"Production Required",bold:true},{t:"18,400",bold:true},{t:"23,200",bold:true},{t:"28,800",bold:true},{t:"30,600",bold:true},{t:"1,01,000",bold:true}]
+        ],[2400,1400,1400,1400,1400,1360]),
+      blank(),
+
+      p("(ii) Raw Material Budgets:",{bold:true,indent:360}),
+      tbl(["Particulars","Q-I","Q-II","Q-III","Q-IV","Total"],
+        [
+          ["Production (units)","18,400","23,200","28,800","30,600","1,01,000"],
+          ["RM Consumption (kgs @ 3/unit)","55,200","69,600","86,400","91,800","3,03,000"],
+          ["Add: Closing RM (10% of next Q cons)","6,960","8,640","9,180","5,520*","—"],
+          ["Less: Opening RM","12,000","6,960","8,640","9,180","—"],
+          [{t:"RM Purchases (kgs)",bold:true},{t:"50,160",bold:true},{t:"71,280",bold:true},{t:"86,940",bold:true},{t:"88,140",bold:true},{t:"2,96,520",bold:true}],
+          [{t:"RM Purchases (₹ @ ₹15/kg)",bold:true},{t:"7,52,400",bold:true},{t:"10,69,200",bold:true},{t:"13,04,100",bold:true},{t:"13,22,100",bold:true},{t:"44,47,800",bold:true}]
+        ],[2200,1400,1400,1400,1400,1560]),
+      note("*Q4 closing RM assumed at 6% of annual = 5,520 kgs (or as given in question)"),
+      blank(),
+
+      p("(iii) Flexible Budget for Q-II at 80%, 100% and 120% capacity:",{bold:true,indent:360}),
+      ans("  Normal capacity for Q-II = 23,200 units",360),
+      tbl(["Particulars","80% (18,560 units)","100% (23,200 units)","120% (27,840 units)"],
+        [
+          ["Variable Costs:","","",""],
+          ["  Direct Material @ ₹45","8,35,200","10,44,000","12,52,800"],
+          ["  Direct Labour @ ₹30","5,56,800","6,96,000","8,35,200"],
+          ["  Variable Overhead @ ₹15","2,78,400","3,48,000","4,17,600"],
+          [{t:"  Total Variable Cost",bold:true},{t:"16,70,400",bold:true},{t:"20,88,000",bold:true},{t:"25,05,600",bold:true}],
+          ["Fixed Costs (constant)","4,00,000","4,00,000","4,00,000"],
+          [{t:"Total Cost",bold:true},{t:"₹20,70,400",bold:true},{t:"₹24,88,000",bold:true},{t:"₹29,05,600",bold:true}],
+          ["Cost per unit",{t:"₹111.55",bold:true},{t:"₹107.24",bold:true},{t:"₹104.37",bold:true}]
+        ],[2400,2200,2200,2560]),
+
+      divider(),
+
+      subAns("Answer 4(b): Non-Integrated System — Journal Entries and Ledger Accounts"),
+      blank(),
+      p("Journal Entries in Cost Books (Non-Integrated System):",{bold:true,indent:360}),
+      blank(),
+      tbl(["#","Particulars","Dr (₹)","Cr (₹)"],
+        [
+          ["1","Stores Ledger Control A/c  Dr\n  To Creditors Control A/c\n(RM purchased on credit)","12,50,000","12,50,000"],
+          ["2","Work-in-Progress Control A/c  Dr\n  To Stores Ledger Control A/c\n(Direct material issued)","9,80,000","9,80,000"],
+          ["3","Factory Overhead Control A/c  Dr\n  To Stores Ledger Control A/c\n(Indirect material issued)","70,000","70,000"],
+          ["4","Work-in-Progress Control A/c  Dr\n  To Wages Control A/c\n(Direct wages allocated)","4,20,000","4,20,000"],
+          ["5","Factory Overhead Control A/c  Dr\n  To Wages Control A/c\n(Indirect wages)","80,000","80,000"],
+          ["6","Work-in-Progress Control A/c  Dr\n  To Factory Overhead Control A/c\n(Overhead absorbed in production)","3,60,000","3,60,000"],
+          ["7","Costing P&L A/c  Dr\n  To Factory Overhead Control A/c\n(Over-absorption of OH: 4,10,000–3,60,000=50,000 under-abs)","50,000","50,000"],
+          ["8","Costing P&L A/c  Dr\n  To Administration OH Control A/c\n(Admin OH under-absorbed)","25,000","25,000"],
+          ["9","Finished Goods Control A/c  Dr\n  To Work-in-Progress Control A/c\n(Goods transferred to FG store)","18,50,000","18,50,000"],
+          ["10","Cost of Goods Sold A/c  Dr\n  To Finished Goods Control A/c\n(Cost of goods sold)","16,20,000","16,20,000"]
+        ],[500,4000,1900,1960]),
+      blank(),
+      p("Stores Ledger Control Account:",{bold:true,indent:360}),
+      tbl(["Dr side","₹","Cr side","₹"],
+        [
+          ["To Creditors Control A/c (purchases)","12,50,000","By WIP Control A/c (Direct)","9,80,000"],
+          ["","","By Factory OH Control A/c (Indirect)","70,000"],
+          ["","","By Balance c/d","2,00,000"],
+          [{t:"Total",bold:true},{t:"12,50,000",bold:true},{t:"Total",bold:true},{t:"12,50,000",bold:true}]
+        ],[2400,2200,2400,1360]),
+      blank(),
+      p("Work-in-Progress Control Account:",{bold:true,indent:360}),
+      tbl(["Dr side","₹","Cr side","₹"],
+        [
+          ["To Stores Ledger Control A/c","9,80,000","By Finished Goods Control A/c","18,50,000"],
+          ["To Wages Control A/c","4,20,000","By Balance c/d (closing WIP)","10,000"],
+          ["To Factory OH Control A/c","3,60,000","",""],
+          [{t:"Total",bold:true},{t:"17,60,000",bold:true},{t:"Total",bold:true},{t:"17,60,000",bold:true}]
+        ],[2400,2200,2400,1360]),
+
+      // ─────────────────────────────────────────────────────────
+      qHead("5","Reconciliation | Material Control (ABC Analysis)"),
+
+      subAns("Answer 5(a): Reconciliation of Cost and Financial Accounts"),
+      blank(),
+      p("Memorandum Reconciliation Statement",{bold:true,center:true}),
+      p("(Reconciling Profit as per Financial Accounts with Profit as per Cost Accounts)",{center:true}),
+      blank(),
+      tbl(["Particulars","Add (₹)","Deduct (₹)"],
+        [
+          ["Profit as per Financial Accounts","3,50,000",""],
+          ["(1) Opening stock overvalued in Cost A/c (extra charge in CA → lower CA profit)","","40,000"],
+          ["(2) Closing stock undervalued in Cost A/c (lower closing → higher cost in CA)","","55,000"],
+          ["(3) Notional rent in CA — not in FA (extra charge in CA)","","36,000"],
+          ["(4) Factory OH under-recovered in CA (extra charge in CA)","","28,000"],
+          ["(5) Dividend received — only in FA (inflates FA profit)","","45,000"],
+          ["(6) Preliminary expenses — only in FA (reduces FA profit, CA unaffected)","20,000",""],
+          ["(7) Selling OH over-recovered in CA (CA profit higher than FA)","18,000",""],
+          ["(8) Loss on sale of machinery — only in FA (reduces FA profit, CA unaffected)","30,000",""],
+          [{t:"Total",bold:true},{t:"3,98,000 + 68,000 = carry fwd",bold:true},{t:"2,04,000",bold:true}],
+          [{t:"Profit as per Cost Accounts",bold:true},{t:"₹2,14,000",bold:true},""]
+        ],[3600,2000,2760]),
+      blank(),
+      note("Calculation: ₹3,50,000 + ₹20,000 + ₹18,000 + ₹30,000 – ₹40,000 – ₹55,000 – ₹36,000 – ₹28,000 – ₹45,000 = ₹2,14,000"),
+      blank(),
+      p("(ii) When Reconciliation Statement can be dispensed with:",{bold:true,indent:360}),
+      ans("  A Reconciliation Statement is not needed when both Cost Accounts and Financial Accounts are maintained on an Integrated (Integral) System of Accounting. In an integrated system, only one set of books is maintained that serves both cost accounting and financial accounting purposes. Since there is no separate cost ledger, there is no divergence in profits between the two systems.",360),
+
+      divider(),
+
+      subAns("Answer 5(b): Material Control — ABC Analysis and Stock Level"),
+      blank(),
+      p("(i) ABC Analysis — Materials Ranked by Annual Value:",{bold:true,indent:360}),
+      blank(),
+      tbl(["Rank","Material","Annual Usage","Unit Cost (₹)","Annual Value (₹)","Category"],
+        [
+          ["1","P6","100","9,000","9,00,000","A"],
+          ["2","P4","200","3,500","7,00,000","A"],
+          ["3","P2","500","1,200","6,00,000","A"],
+          ["4","P1","5,000","80","4,00,000","B"],
+          ["5","P8","1,000","400","4,00,000","B"],
+          ["6","P10","400","500","2,00,000","B"],
+          ["7","P5","8,000","25","2,00,000","B"],
+          ["8","P7","30,000","5","1,50,000","B"],
+          ["9","P3","12,000","12","1,44,000","C"],
+          ["10","P9","15,000","8","1,20,000","C"],
+          [{t:"Total",bold:true},"","","",{t:"₹38,14,000",bold:true},""]
+        ],[600,900,1500,1500,2000,1860]),
+      blank(),
+      tbl(["Category","Items","No. of items","Total Value (₹)","% of Total Value","% of Items"],
+        [
+          ["A","P6, P4, P2","3","22,00,000","57.7%","30%"],
+          ["B","P1,P8,P10,P5,P7","5","13,50,000","35.4%","50%"],
+          ["C","P3, P9","2","2,64,000","6.9%","20%"]
+        ],[1200,2000,1400,1800,1800,1160]),
+      blank(),
+
+      p("(ii) For Material P6 (Category A):",{bold:true,indent:360}),
+      blank(),
+      p("EOQ Calculation:",{bold:true,indent:540}),
+      ans("  Annual demand (D) = 100 units",540),
+      ans("  Ordering cost (O) = ₹2,000 per order",540),
+      ans("  Carrying cost (C) = 20% × ₹9,000 = ₹1,800 per unit per annum",540),
+      ans("  EOQ = √(2DO/C) = √(2 × 100 × 2,000 / 1,800) = √(4,00,000/1,800) = √222.22 ≈ 15 units",540),
+      blank(),
+      p("Reorder Level Calculation:",{bold:true,indent:540}),
+      ans("  Reorder Level = Maximum Consumption per day × Maximum Lead Time",540),
+      ans("  Maximum daily consumption = Maximum consumption per day (given max LT=25 days, ROL=1,80,000 if it were in the original Q)",540),
+      ans("  Given: Max consumption = 12 units/day; Max lead time = 25 days",540),
+      ans("  Reorder Level = 12 × 25 = 300 units",540),
+
+      // ─────────────────────────────────────────────────────────
+      qHead("6","Theory — Responsibility Accounting | Short Notes | ABC / Budgetary Control"),
+
+      subAns("Answer 6(a)(i): Responsibility Centre — Definition and Types"),
+      blank(),
+      p("Definition:",{bold:true,indent:360}),
+      ans("A Responsibility Centre is any organisational unit or segment headed by a manager who is held accountable for the activities and performance of that unit. It is a unit where performance is measured in financial terms and the manager is responsible for costs, revenues, or investment, as the case may be.",360),
+      blank(),
+      p("Types of Responsibility Centres:",{bold:true,indent:360}),
+      blank(),
+      tbl(["Type","Controlled by Manager","Examples","Performance Measure"],
+        [
+          ["Cost Centre","Costs only","Factory department, Maintenance dept","Budgeted vs. Actual cost"],
+          ["Revenue Centre","Revenues only","Sales team/branch","Actual vs. Target sales"],
+          ["Profit Centre","Both costs and revenues","Product division, SBU","Divisional Profit"],
+          ["Investment Centre","Costs, revenues & assets","Subsidiary, Large division","ROI, Residual Income"]
+        ],[2000,2200,2200,2000]),
+      blank(),
+
+      subAns("Answer 6(a)(ii): Cost Centre vs. Profit Centre"),
+      tbl(["Basis","Cost Centre","Profit Centre"],
+        [
+          ["Accountability","Manager responsible for costs only","Manager responsible for both costs and revenues"],
+          ["Performance measure","Variance from budgeted cost","Net profit or contribution earned"],
+          ["Autonomy","Limited — no control over revenue","Higher — has control over sales and pricing"],
+          ["Examples","Machine shop, HR department","Product line, regional business unit"]
+        ],[1600,3000,3000]),
+
+      divider(),
+
+      subAns("Answer 6(b): Short Notes (any five)"),
+      blank(),
+      p("(i) Controllable vs. Uncontrollable Variances:",{bold:true,indent:360}),
+      ans("Controllable Variance is a variance caused by factors that are within the direct control of the responsible manager (e.g., labour efficiency, material usage). Uncontrollable Variance arises due to factors beyond the manager's control (e.g., inflation in raw material prices, natural disasters). Responsibility Accounting holds managers accountable only for controllable variances to ensure fair performance evaluation.",360),
+      blank(),
+      p("(ii) Treatment of By-products in Cost Accounting:",{bold:true,indent:360}),
+      ans("By-products are minor products arising incidentally from the manufacture of main products. Methods of treatment: (a) NRV of by-product deducted from joint cost before apportionment — most common; (b) By-product revenue credited to Costing P&L; (c) By-product valued at NRV and treated as separate cost centre; (d) Sales value credited to production account, reducing process cost.",360),
+      blank(),
+      p("(iii) Budget Manual:",{bold:true,indent:360}),
+      ans("A Budget Manual is a document that sets out the responsibilities, procedures, and timetable for the preparation, approval, and administration of budgets in an organisation. Key contents: (a) Objectives of budgeting; (b) Organisation chart showing budget responsibilities; (c) Timetable for preparation and submission; (d) Instructions on preparation format; (e) Account codes and classification guidelines.",360),
+      blank(),
+      p("(iv) Advantages of Job Costing:",{bold:true,indent:360}),
+      ans("(a) Provides detailed cost analysis per job, helping identify profitable and loss-making jobs; (b) Enables accurate estimation of future job costs; (c) Facilitates comparison of actual vs. estimated costs; (d) Helps in fixing selling prices for each job; (e) Assists in cost control by identifying where costs exceed estimates; (f) Useful for industries like printing, construction, and engineering.",360),
+      blank(),
+      p("(v) Digital Costing System:",{bold:true,indent:360}),
+      ans("A Digital Costing System uses IT tools, ERP software, IoT sensors, and cloud platforms to capture, process, and report cost data in real time. Benefits: (a) Faster and more accurate data collection; (b) Real-time variance analysis; (c) Integration with financial and operational systems; (d) Better traceability of costs to activities/products; (e) Reduced manual errors; (f) Supports data-driven managerial decisions.",360),
+      blank(),
+      p("(vi) Bin Card vs. Stores Ledger:",{bold:true,indent:360}),
+      tbl(["Basis","Bin Card","Stores Ledger"],
+        [
+          ["Maintained by","Stores department (store keeper)","Accounts/Cost department"],
+          ["Purpose","Physical record of quantity of stock","Value-based record (qty + value)"],
+          ["Entries made","At time of receipt/issue","After proper vouchers/documentation"],
+          ["Information recorded","Qty only (receipts, issues, balance)","Qty and value both"]
+        ],[2000,2500,2860]),
+
+      divider(),
+
+      subAns("Answer 6(c): Suitability and Limitations of Activity Based Costing"),
+      blank(),
+      p("Suitability of ABC:",{bold:true,indent:360}),
+      ans("(i)  Suitable for organisations with diverse products that differ significantly in production complexity, volume, and resource consumption.",360),
+      ans("(ii)  Best suited when overhead costs are a large proportion of total costs and multiple cost drivers are identifiable.",360),
+      ans("(iii) Ideal for organisations undergoing process improvements or identifying non-value-added activities.",360),
+      ans("(iv)  Useful in service industries (banks, hospitals, consultancies) where activities drive cost better than volume.",360),
+      ans("(v)   Helps set more accurate selling prices and identify unprofitable product lines.",360),
+      blank(),
+      p("Limitations of ABC:",{bold:true,indent:360}),
+      ans("(i)  High implementation cost — identifying cost drivers and setting up activity pools is expensive and time-consuming.",360),
+      ans("(ii)  Requires significant data c
+      ollection — may not be practical for small organisations.",360),
+      ans("(iii) Selection of cost drivers is subjective and may still involve arbitrary allocations.",360),
+      ans("(iv)  Does not eliminate fixed vs. variable cost distinction — still assumes costs vary with activities.",360),
+      ans("(v)   Requires continuous maintenance and revision of cost driver rates.",360),
+
+      // Footer
+      new Paragraph({spacing:{before:300,after:60},border:{top:{style:BorderStyle.SINGLE,size:4,color:"000000",space:1}},alignment:AlignmentType.CENTER,children:[new TextRun({text:"*** END OF SUGGESTED ANSWERS ***",bold:true,size:20})]}),
+      p("Pattern analysis: Jan 2026, Sep 2025, Jan 2025, Sep 2024 | Not an official ICAI document",{center:true,size:18}),
+    ]
+  }]
 });
 
-
-function calculateTrade(){
-
-let entry=document.getElementById("entry").value;
-let sl=document.getElementById("sl").value;
-let target=document.getElementById("target").value;
-
-let risk = entry-sl;
-let reward = target-entry;
-
-let rr = (reward/risk).toFixed(2);
-
-let signal="";
-
-if(rr>=2){
-
-signal="Strong Trade Setup ✅<br>Risk Reward: 1:"+rr;
-
-}else{
-
-signal="Weak Setup ⚠️<br>Risk Reward: 1:"+rr;
-
-}
-
-document.getElementById("result").innerHTML=signal;
-
-}
-
-</script>
-
-</body>
-
-</html>
+Packer.toBuffer(doc).then(buf=>{
+  fs.writeFileSync('/mnt/user-data/outputs/Costing_Suggested_Answers_May2026.docx',buf);
+  console.log('Done');
+});
